@@ -1,0 +1,7 @@
+﻿.ipynb_checkpoints/
+__pycache__/
+lightning_logs/
+lightning_logs.stale_*/
+*.pyc
+.DS_Store
+data/raw/

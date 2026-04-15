@@ -1,0 +1,13 @@
+﻿pandas>=2.0
+numpy>=1.26,<2
+matplotlib>=3.7
+seaborn>=0.13
+pyarrow>=15
+statsmodels>=0.14
+pmdarima>=2.0
+neuralprophet>=0.9
+geopandas>=0.14
+shapely>=2.0
+folium>=0.16
+jupyter>=1.0
+nbformat>=5.9
