@@ -23,12 +23,12 @@ The integer in `outputs/File_1.csv` is the direct output of that notebook.
 ## Team + ownership
 | Role | Owner | Folder |
 |---|---|---|
-| T1 Forecast Lead | Diego | `01_forecast/` + fork |
-| T2 GIS/Optimisation | TBD | `02_charging_network/` |
-| T3 Grid Viability | TBD | `03_grid_viability/` |
-| N1 PM | TBD | repo admin |
-| N2 Report | TBD | `report/` |
-| N3 BI + Pitch | TBD | `bi_visualization/` + `presentation/` |
+| T1 Forecast / Objective 1 / Objective 2 | Diego | `01_forecast/` + fork |
+| T2 Objective 2 / Dashboard | Marco | `02_charging_network/` |
+| T3 Objective 3 / Report | Gloriana | `03_grid_viability/` |
+| N1 Report | Michael | Project Manager |
+| N2 BI + Pitch | Claudia | `report/` |
+| N3 BI + Pitch | Cecile | `bi_visualization/` + `presentation/` |
 
 ## Workflow
 Nobody pushes to `main`. Create a branch: `git checkout -b <initials>/<topic>`. Open a PR. N1 merges.
