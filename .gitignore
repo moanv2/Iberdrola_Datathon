@@ -5,3 +5,4 @@ lightning_logs.stale_*/
 *.pyc
 .DS_Store
 data/raw/
+data/processed/

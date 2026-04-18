@@ -1,0 +1,16 @@
+bottleneck_id,latitude,longitude,route_segment,distributor_network,estimated_demand_kw,grid_status
+FRIC_001,42.78247,-7.89001,N-640,i-DE,300,Congested
+FRIC_002,41.93092,-6.11659,N-631,i-DE,600,Moderate
+FRIC_003,42.12507,0.40344,N-123,Endesa,600,Moderate
+FRIC_004,43.13948,-1.55327,N-121,i-DE,600,Moderate
+FRIC_005,39.5103,-7.11023,N-521,i-DE,600,Moderate
+FRIC_006,42.50674,-7.52404,N-120,i-DE,600,Moderate
+FRIC_007,43.1696,-5.07506,N-625,Viesgo,600,Moderate
+FRIC_008,42.31315,-4.7168,N-120,i-DE,300,Congested
+FRIC_009,43.09772,-4.68463,N-621,Viesgo,300,Congested
+FRIC_010,43.38258,-6.08972,A-63,Viesgo,600,Moderate
+FRIC_011,39.29113,-5.0976,N-502,i-DE,600,Moderate
+FRIC_012,39.76613,-3.14194,AP-36,i-DE,600,Moderate
+FRIC_013,42.17957,0.33653,N-123,Endesa,600,Moderate
+FRIC_014,39.46588,-6.97559,N-521,i-DE,600,Moderate
+FRIC_015,42.55675,-4.36465,A-67,i-DE,600,Moderate
