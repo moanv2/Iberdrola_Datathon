@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Iberdrola EV Charging Network 2027</title>
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; }
+    
+    #header {
+      background: #003087; /* Iberdrola dark blue */
+      color: white;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    #header h1 { font-size: 18px; }
+    
+    #kpi-bar {
+      background: #f5f5f5;
+      border-bottom: 1px solid #ddd;
+      padding: 8px 20px;
+      display: flex;
+      gap: 40px;
+    }
+    
+    .kpi {
+      text-align: center;
+    }
+    
+    .kpi-value {
+      font-size: 22px;
+      font-weight: bold;
+      color: #003087;
+    }
+    
+    .kpi-label {
+      font-size: 11px;
+      color: #666;
+    }
+    
+    #controls {
+      background: white;
+      padding: 8px 20px;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    
+    #controls label {
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    #map {
+      height: calc(100vh - 130px);
+      width: 100%;
+    }
+    
+    #legend {
+      background: white;
+      padding: 10px 14px;
+      border-radius: 6px;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.3);
+      line-height: 24px;
+      font-size: 13px;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div id="header">
+  <h1>⚡ Iberdrola EV Charging Network — Spain 2027</h1>
+  <span style="font-size:13px; opacity:0.8">IE Sustainability Datathon March 2026</span>
+</div>
+
+<!-- KPI BAR — fill these numbers from your File 1 -->
+<div id="kpi-bar">
+  <div class="kpi">
+    <div class="kpi-value" id="kpi-proposed">—</div>
+    <div class="kpi-label">Proposed Stations</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-value" id="kpi-existing">—</div>
+    <div class="kpi-label">Existing Baseline</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-value" id="kpi-friction">—</div>
+    <div class="kpi-label">Friction Points</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-value" id="kpi-ev2027">—</div>
+    <div class="kpi-label">Projected EVs 2027</div>
+  </div>
+</div>
+
+<!-- LAYER TOGGLES -->
+<div id="controls">
+  <strong style="font-size:13px">Layers:</strong>
+  <label><input type="checkbox" id="toggle-stations" checked> Charging Stations</label>
+  <label><input type="checkbox" id="toggle-friction" checked> Friction Points</label>
+  <label>
+    Filter grid status:
+    <select id="filter-status">
+      <option value="all">All</option>
+      <option value="Sufficient">Sufficient only</option>
+      <option value="Moderate">Moderate only</option>
+      <option value="Congested">Congested only</option>
+    </select>
+  </label>
+</div>
+
+<!-- MAP -->
+<div id="map"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+// ============================================================
+// 1. PASTE YOUR DATA HERE (from File 1, File 2, File 3)
+// ============================================================
+
+const FILE1_KPIS = {
+  total_proposed_stations: 0,      // <- paste from File 1
+  total_existing_stations_baseline: 0,
+  total_friction_points: 0,
+  total_ev_projected_2027: 0
+};
+
+// File 2 — proposed charging stations
+// Copy this format for every row in your File 2
+const FILE2_STATIONS = [
+  {
+    location_id: "IBE_001",
+    latitude: 40.4168,
+    longitude: -3.7038,
+    route_segment: "A-6",
+    n_chargers_proposed: 6,
+    grid_status: "Sufficient"
+  },
+  {
+    location_id: "IBE_002",
+    latitude: 41.3851,
+    longitude: 2.1734,
+    route_segment: "AP-7",
+    n_chargers_proposed: 4,
+    grid_status: "Moderate"
+  },
+  {
+    location_id: "IBE_003",
+    latitude: 37.3891,
+    longitude: -5.9845,
+    route_segment: "A-4",
+    n_chargers_proposed: 8,
+    grid_status: "Congested"
+  },
+  // ... add all your stations here
+];
+
+// File 3 — friction points (Moderate + Congested only)
+const FILE3_FRICTION = [
+  {
+    bottleneck_id: "FRIC_001",
+    latitude: 41.3851,
+    longitude: 2.1734,
+    route_segment: "AP-7",
+    distributor_network: "i-DE",
+    estimated_demand_kw: 600,
+    grid_status: "Moderate"
+  },
+  // ... add all your friction points here
+];
+
+// ============================================================
+// 2. MAP SETUP
+// ============================================================
+
+const map = L.map('map').setView([40.4, -3.7], 6);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+// ============================================================
+// 3. COLOR + ICON HELPERS
+// ============================================================
+
+const STATUS_COLORS = {
+  Sufficient: '#2ecc71',   // green
+  Moderate:   '#f39c12',   // yellow/orange
+  Congested:  '#e74c3c'    // red
+};
+
+function stationIcon(status) {
+  const color = STATUS_COLORS[status] || '#999';
+  return L.divIcon({
+    className: '',
+    html: `<div style="
+      width:14px; height:14px;
+      background:${color};
+      border:2px solid white;
+      border-radius:50%;
+      box-shadow:0 1px 4px rgba(0,0,0,0.4);
+    "></div>`,
+    iconSize: [14, 14],
+    iconAnchor: [7, 7]
+  });
+}
+
+function frictionIcon(status) {
+  const color = STATUS_COLORS[status] || '#999';
+  return L.divIcon({
+    className: '',
+    html: `<div style="
+      width:18px; height:18px;
+      background:${color};
+      border:2px solid #333;
+      border-radius:3px;
+      box-shadow:0 1px 4px rgba(0,0,0,0.5);
+      opacity:0.85;
+    "></div>`,
+    iconSize: [18, 18],
+    iconAnchor: [9, 9]
+  });
+}
+
+// ============================================================
+// 4. RENDER STATIONS (File 2) — circles
+// ============================================================
+
+let stationMarkers = [];
+
+function renderStations(filterStatus) {
+  stationMarkers.forEach(m => map.removeLayer(m));
+  stationMarkers = [];
+
+  FILE2_STATIONS.forEach(s => {
+    if (filterStatus !== 'all' && s.grid_status !== filterStatus) return;
+
+    const marker = L.marker([s.latitude, s.longitude], {
+      icon: stationIcon(s.grid_status)
+    }).bindPopup(`
+      <div style="font-size:13px; min-width:180px">
+        <b>${s.location_id}</b><br>
+        <hr style="margin:4px 0">
+        🛣 Route: <b>${s.route_segment}</b><br>
+        ⚡ Chargers: <b>${s.n_chargers_proposed}</b><br>
+        🔋 Demand: <b>${s.n_chargers_proposed * 150} kW</b><br>
+        🟢 Grid status: <b style="color:${STATUS_COLORS[s.grid_status]}">${s.grid_status}</b>
+      </div>
+    `);
+
+    marker.addTo(map);
+    stationMarkers.push(marker);
+  });
+}
+
+// ============================================================
+// 5. RENDER FRICTION POINTS (File 3) — squares
+// ============================================================
+
+let frictionMarkers = [];
+
+function renderFriction() {
+  frictionMarkers.forEach(m => map.removeLayer(m));
+  frictionMarkers = [];
+
+  FILE3_FRICTION.forEach(f => {
+    const marker = L.marker([f.latitude, f.longitude], {
+      icon: frictionIcon(f.grid_status)
+    }).bindPopup(`
+      <div style="font-size:13px; min-width:180px">
+        <b>⚠️ ${f.bottleneck_id}</b><br>
+        <hr style="margin:4px 0">
+        🛣 Route: <b>${f.route_segment}</b><br>
+        🏭 Distributor: <b>${f.distributor_network}</b><br>
+        ⚡ Demand: <b>${f.estimated_demand_kw} kW</b><br>
+        🔴 Status: <b style="color:${STATUS_COLORS[f.grid_status]}">${f.grid_status}</b>
+      </div>
+    `);
+
+    marker.addTo(map);
+    frictionMarkers.push(marker);
+  });
+}
+
+// ============================================================
+// 6. LEGEND
+// ============================================================
+
+const legend = L.control({ position: 'bottomright' });
+legend.onAdd = function() {
+  const div = L.DomUtil.create('div', 'legend');
+  div.id = 'legend';
+  div.innerHTML = `
+    <b style="font-size:13px">Grid Status</b><br><br>
+    <div class="legend-item">
+      <span class="legend-dot" style="background:#2ecc71"></span> Sufficient
+    </div>
+    <div class="legend-item">
+      <span class="legend-dot" style="background:#f39c12"></span> Moderate
+    </div>
+    <div class="legend-item">
+      <span class="legend-dot" style="background:#e74c3c"></span> Congested
+    </div>
+    <br>
+    <div class="legend-item">
+      <span class="legend-dot" style="background:#999"></span> ● Station
+    </div>
+    <div class="legend-item">
+      <span style="display:inline-block;width:12px;height:12px;background:#999;border-radius:2px"></span> ■ Friction point
+    </div>
+  `;
+  return div;
+};
+legend.addTo(map);
+
+// ============================================================
+// 7. CONTROLS (toggles + filter)
+// ============================================================
+
+document.getElementById('toggle-stations').addEventListener('change', function() {
+  const status = document.getElementById('filter-status').value;
+  if (this.checked) renderStations(status);
+  else { stationMarkers.forEach(m => map.removeLayer(m)); stationMarkers = []; }
+});
+
+document.getElementById('toggle-friction').addEventListener('change', function() {
+  if (this.checked) renderFriction();
+  else { frictionMarkers.forEach(m => map.removeLayer(m)); frictionMarkers = []; }
+});
+
+document.getElementById('filter-status').addEventListener('change', function() {
+  if (document.getElementById('toggle-stations').checked) {
+    renderStations(this.value);
+  }
+});
+
+// ============================================================
+// 8. KPI BAR — populate from File 1
+// ============================================================
+
+document.getElementById('kpi-proposed').textContent = FILE1_KPIS.total_proposed_stations.toLocaleString();
+document.getElementById('kpi-existing').textContent = FILE1_KPIS.total_existing_stations_baseline.toLocaleString();
+document.getElementById('kpi-friction').textContent = FILE1_KPIS.total_friction_points.toLocaleString();
+document.getElementById('kpi-ev2027').textContent   = FILE1_KPIS.total_ev_projected_2027.toLocaleString();
+
+// ============================================================
+// 9. INITIAL RENDER
+// ============================================================
+
+renderStations('all');
+renderFriction();
+
+</script>
+</body>
+</html>
