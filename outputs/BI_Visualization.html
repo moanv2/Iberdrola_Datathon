@@ -183,26 +183,57 @@ html,body{
 .mini-cv{flex:1;position:relative;min-height:0;}
 
 /* ════════════════════════════
-   S4 — KPI + ROADMAP
+   S4 — KPI + ROADMAP (redesign)
 ════════════════════════════ */
 #s4{display:grid;grid-template-rows:52px 1fr;}
-.s4-body{display:grid;grid-template-columns:1fr 1fr 1fr;height:100%;overflow:hidden;}
-.s4-col{padding:14px 16px 14px 20px;display:flex;flex-direction:column;gap:7px;overflow-y:auto;border-right:1px solid var(--border);}
-.s4-col:last-child{border:none;}
-.s4-col-h{font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;margin-bottom:2px;}
-.s4-col-h .nm{font-family:'JetBrains Mono',monospace;font-size:9px;background:var(--g);color:#fff;padding:1px 6px;border-radius:3px;font-weight:700;}
-.s4-lead{font-size:9.5px;color:var(--muted);line-height:1.5;margin-bottom:6px;}
-.kpi-mini{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:9px 11px;}
-.kpi-mini-h{font-size:9.5px;font-weight:600;color:var(--text);margin-bottom:2px;}
-.kpi-mini-v{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--glt);font-weight:600;margin:2px 0;}
-.kpi-mini-d{font-size:8.5px;color:var(--muted);line-height:1.45;}
-.roadmap-box{margin-top:4px;display:flex;flex-direction:column;gap:7px;}
-.phase{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:9px 12px 9px 18px;position:relative;}
-.phase::before{content:'';position:absolute;left:9px;top:12px;bottom:12px;width:2px;background:var(--g);}
-.phase-h{font-size:10px;font-weight:600;color:var(--text);display:flex;justify-content:space-between;gap:6px;margin-bottom:3px;flex-wrap:wrap;}
-.phase-t{font-family:'JetBrains Mono',monospace;color:var(--g);font-size:8px;}
-.phase-d{font-size:8.5px;color:var(--text2);line-height:1.5;}
-
+.s4-new-body{
+  position:absolute;inset:0;top:52px;bottom:0;
+  display:flex;flex-direction:column;
+  padding:18px 28px 16px;gap:14px;
+}
+.s4-tier-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;flex:1;}
+.s4-tier-card{
+  border-radius:10px;border:1px solid var(--border);
+  padding:18px 20px;display:flex;flex-direction:column;gap:12px;
+  position:relative;overflow:hidden;
+}
+.s4-tier-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.s4-tier-s{background:linear-gradient(160deg,rgba(0,164,67,.1),var(--card));}
+.s4-tier-s::before{background:var(--g);}
+.s4-tier-o{background:linear-gradient(160deg,rgba(243,146,0,.1),var(--card));}
+.s4-tier-o::before{background:var(--o);}
+.s4-tier-p{background:linear-gradient(160deg,rgba(0,158,224,.1),var(--card));}
+.s4-tier-p::before{background:var(--b);}
+.s4-tier-header{display:flex;align-items:center;gap:10px;}
+.s4-tier-letter{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;}
+.s4-tier-s .s4-tier-letter{background:var(--g);}
+.s4-tier-o .s4-tier-letter{background:var(--o);}
+.s4-tier-p .s4-tier-letter{background:var(--b);}
+.s4-tier-name{font-size:15px;font-weight:700;color:var(--text);}
+.s4-tier-items{display:flex;flex-direction:column;gap:7px;}
+.s4-ti{display:flex;align-items:baseline;gap:8px;padding:7px 10px;background:rgba(255,255,255,.03);border-radius:6px;border:1px solid var(--border);}
+.s4-ti-val{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;white-space:nowrap;min-width:52px;}
+.s4-tier-s .s4-ti-val{color:var(--glt);}
+.s4-tier-o .s4-ti-val{color:var(--o);}
+.s4-tier-p .s4-ti-val{color:var(--b);}
+.s4-ti-label{font-size:9.5px;color:var(--muted);line-height:1.3;}
+.s4-roadmap-row{display:flex;flex-direction:column;gap:8px;flex-shrink:0;}
+.s4-rm-label{font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);}
+.s4-timeline{display:flex;align-items:stretch;gap:0;}
+.s4-phase{flex:1;padding:12px 16px;border-radius:8px;border:1px solid var(--border);background:var(--card);display:flex;flex-direction:column;gap:4px;position:relative;overflow:hidden;}
+.s4-phase::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
+.s4-ph-g::after{background:var(--g);}
+.s4-ph-o::after{background:var(--o);}
+.s4-ph-r::after{background:var(--r);}
+.s4-ph-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;}
+.s4-ph-num{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#fff;background:var(--border2);padding:1px 6px;border-radius:3px;}
+.s4-ph-period{font-family:'JetBrains Mono',monospace;font-size:8px;}
+.s4-ph-g .s4-ph-period{color:var(--g);}
+.s4-ph-o .s4-ph-period{color:var(--o);}
+.s4-ph-r .s4-ph-period{color:var(--r);}
+.s4-ph-title{font-size:12px;font-weight:700;color:var(--text);}
+.s4-ph-desc{font-size:9px;color:var(--muted);}
+.s4-tl-arrow{display:flex;align-items:center;padding:0 10px;font-size:18px;color:var(--border2);flex-shrink:0;}
 /* ════════════════════════════
    S5 — CLOSE
 ════════════════════════════ */
@@ -385,35 +416,82 @@ html,body{
       <div class="ks-item"><div class="ks-v">€180M</div><div class="ks-l">Indicative capex</div></div>
     </div>
   </div>
-  <div class="s4-body">
-    <div class="s4-col">
-      <div class="s4-col-h"><span class="nm">S</span>Strategic KPIs</div>
-      <p class="s4-lead">Board-facing. Tied to FY27 EV objectives and PNIEC 2030.</p>
-      <div class="kpi-mini"><div class="kpi-mini-h">Corridor coverage ratio</div><div class="kpi-mini-v">100% of 19 corridors by Q4 2027</div><div class="kpi-mini-d">≥1 Iberdrola DCFC within 60 km spacing.</div></div>
-      <div class="kpi-mini"><div class="kpi-mini-h">Grid readiness index</div><div class="kpi-mini-v">85% sites Moderate or Sufficient</div><div class="kpi-mini-d">Baseline 21%.</div></div>
-      <div class="kpi-mini"><div class="kpi-mini-h">i-DE load share captured</div><div class="kpi-mini-v">18.6 MW activated on i-DE by 2027</div><div class="kpi-mini-d">14 of 19 sites on i-DE feeders.</div></div>
-      <div class="kpi-mini"><div class="kpi-mini-h">Revenue per kWh</div><div class="kpi-mini-v">Benchmark vs. fast charging market</div><div class="kpi-mini-d">Net margin after wholesale, network fees, OPEX.</div></div>
-    </div>
-    <div class="s4-col">
-      <div class="s4-col-h"><span class="nm">O</span>Operational KPIs</div>
-      <p class="s4-lead">Network planning. Track weekly, escalate on breach.</p>
-      <div class="kpi-mini"><div class="kpi-mini-h">Critical zone burndown</div><div class="kpi-mini-v">35 zones → 0 by Q2 2028</div></div>
-      <div class="kpi-mini"><div class="kpi-mini-h">Friction point resolution</div><div class="kpi-mini-v">14 open → target 3 by Q4 2026</div></div>
-      <div class="kpi-mini"><div class="kpi-mini-h">Mean deficit MW per site</div><div class="kpi-mini-v">0.3 MW → target &lt;0.1 MW</div></div>
-      <div class="kpi-mini"><div class="kpi-mini-h">Commissioning lead time</div><div class="kpi-mini-v">Target &lt;12 months siting to energized</div></div>
-      <div class="kpi-mini"><div class="kpi-mini-h">Utilization</div><div class="kpi-mini-v">40% of modelled peak by month 12</div></div>
-    </div>
-    <div class="s4-col">
-      <div class="s4-col-h"><span class="nm">P</span>Portfolio + Roadmap</div>
-      <p class="s4-lead">Asset view + phased deployment.</p>
-      <div class="kpi-mini"><div class="kpi-mini-h">Province concentration</div><div class="kpi-mini-v">Top 5 carry 58% of stations</div><div class="kpi-mini-d">Asturias · Cáceres · Huesca · Lugo · Illes Balears</div></div>
-      <div class="kpi-mini"><div class="kpi-mini-h">Capex at risk</div><div class="kpi-mini-v">€12M tied to 3 congested sites</div></div>
-      <div class="roadmap-box">
-        <div class="phase"><div class="phase-h"><span>Phase 1 · Grid reinforcement lock-in</span><span class="phase-t">Q2–Q4 2026</span></div><div class="phase-d">Submit access requests for 15 priority zones on A-6, A-3, A-4. Lock transformer slots.</div></div>
-        <div class="phase"><div class="phase-h"><span>Phase 2 · Corridor rollout wave one</span><span class="phase-t">Q1–Q3 2027</span></div><div class="phase-d">Energize 12 Moderate and Sufficient sites. Activate 14.4 MW on i-DE.</div></div>
-        <div class="phase"><div class="phase-h"><span>Phase 3 · Congested sites + tier 4</span><span class="phase-t">Q4 2027–Q2 2028</span></div><div class="phase-d">Bring online 3 Congested stations after substation upgrades.</div></div>
+
+  <div class="s4-new-body">
+
+    <div class="s4-tier-row">
+      <div class="s4-tier-card s4-tier-s">
+        <div class="s4-tier-header">
+          <div class="s4-tier-letter">S</div>
+          <div class="s4-tier-name">Strategic</div>
+        </div>
+        <div class="s4-tier-items">
+          <div class="s4-ti"><span class="s4-ti-val">100%</span><span class="s4-ti-label">Corridor coverage by Q4 2027</span></div>
+          <div class="s4-ti"><span class="s4-ti-val">85%</span><span class="s4-ti-label">Grid readiness target</span></div>
+          <div class="s4-ti"><span class="s4-ti-val">18.6 MW</span><span class="s4-ti-label">i-DE load share by 2027</span></div>
+          <div class="s4-ti"><span class="s4-ti-val">€/kWh</span><span class="s4-ti-label">Revenue benchmark</span></div>
+        </div>
+      </div>
+
+      <div class="s4-tier-card s4-tier-o">
+        <div class="s4-tier-header">
+          <div class="s4-tier-letter">O</div>
+          <div class="s4-tier-name">Operational</div>
+        </div>
+        <div class="s4-tier-items">
+          <div class="s4-ti"><span class="s4-ti-val">35→0</span><span class="s4-ti-label">Critical zones by Q2 2028</span></div>
+          <div class="s4-ti"><span class="s4-ti-val">14→3</span><span class="s4-ti-label">Friction pts by Q4 2026</span></div>
+          <div class="s4-ti"><span class="s4-ti-val">&lt;0.1 MW</span><span class="s4-ti-label">Deficit target per site</span></div>
+          <div class="s4-ti"><span class="s4-ti-val">&lt;12 mo</span><span class="s4-ti-label">Commissioning lead time</span></div>
+        </div>
+      </div>
+
+      <div class="s4-tier-card s4-tier-p">
+        <div class="s4-tier-header">
+          <div class="s4-tier-letter">P</div>
+          <div class="s4-tier-name">Portfolio</div>
+        </div>
+        <div class="s4-tier-items">
+          <div class="s4-ti"><span class="s4-ti-val">58%</span><span class="s4-ti-label">Stations in top 5 provinces</span></div>
+          <div class="s4-ti"><span class="s4-ti-val">€12M</span><span class="s4-ti-label">Capex at risk (3 sites)</span></div>
+          <div class="s4-ti"><span class="s4-ti-val">40%</span><span class="s4-ti-label">Utilization target month 12</span></div>
+          <div class="s4-ti"><span class="s4-ti-val">4</span><span class="s4-ti-label">Tier-4 anchor sites by Q4 2027</span></div>
+        </div>
       </div>
     </div>
+
+    <div class="s4-roadmap-row">
+      <div class="s4-rm-label">Deployment timeline</div>
+      <div class="s4-timeline">
+        <div class="s4-phase s4-ph-g">
+          <div class="s4-ph-top">
+            <div class="s4-ph-num">01</div>
+            <div class="s4-ph-period">Q2–Q4 2026</div>
+          </div>
+          <div class="s4-ph-title">Grid Lock-in</div>
+          <div class="s4-ph-desc">15 access requests · A-6, A-3, A-4 nodes</div>
+        </div>
+        <div class="s4-tl-arrow">→</div>
+        <div class="s4-phase s4-ph-o">
+          <div class="s4-ph-top">
+            <div class="s4-ph-num">02</div>
+            <div class="s4-ph-period">Q1–Q3 2027</div>
+          </div>
+          <div class="s4-ph-title">Corridor Rollout</div>
+          <div class="s4-ph-desc">12 sites energized · 14.4 MW on i-DE</div>
+        </div>
+        <div class="s4-tl-arrow">→</div>
+        <div class="s4-phase s4-ph-r">
+          <div class="s4-ph-top">
+            <div class="s4-ph-num">03</div>
+            <div class="s4-ph-period">Q4 2027–Q2 2028</div>
+          </div>
+          <div class="s4-ph-title">Reinforce & Complete</div>
+          <div class="s4-ph-desc">3 congested stations · substation upgrades</div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
