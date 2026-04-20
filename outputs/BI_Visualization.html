@@ -151,6 +151,7 @@ html,body{
 #s3{display:grid;grid-template-rows:52px 1fr;}
 .s3-body{display:grid;grid-template-columns:1.05fr 1fr;height:100%;overflow:hidden;}
 .s3-left{padding:14px 18px 14px 24px;display:flex;flex-direction:column;gap:10px;border-right:1px solid var(--border);overflow:hidden;}
+.s3-left .zt{flex:1;}
 .s3-desc{font-size:10px;color:var(--text2);line-height:1.6;}
 .s3-desc b{color:var(--text);}
 .zt{background:var(--card);border:1px solid var(--border);border-radius:7px;overflow:hidden;flex:1;display:flex;flex-direction:column;}
@@ -165,8 +166,8 @@ html,body{
 .zt-def{font-family:'JetBrains Mono',monospace;color:var(--r);font-weight:600;font-size:9px;}
 .zt-pr{font-family:'JetBrains Mono',monospace;color:var(--text);font-weight:600;font-size:9px;}
 
-.s3-right{padding:14px 18px;display:grid;grid-template-rows:auto 1fr 1fr;gap:10px;overflow:hidden;}
-.dist-card{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:10px 12px;}
+.s3-right{padding:14px 18px;display:grid;grid-template-rows:auto 1fr;gap:10px;overflow:hidden;}
+.dist-card{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:10px 12px;flex-shrink:0;}
 .card-hdr{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;}
 .card-t{font-size:10.5px;font-weight:600;color:var(--text);}
 .card-tag{font-family:'JetBrains Mono',monospace;font-size:7.5px;color:var(--muted);letter-spacing:.09em;text-transform:uppercase;}
@@ -176,8 +177,8 @@ html,body{
 .db-bar{height:9px;background:var(--faint);border-radius:2px;overflow:hidden;}
 .db-fill{height:100%;border-radius:2px;}
 .db-val{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--text2);text-align:right;}
-.mini-charts{display:grid;grid-template-columns:1fr 1fr;gap:8px;overflow:hidden;}
-.mini-card{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:9px 10px;display:flex;flex-direction:column;overflow:hidden;}
+.mini-charts{display:grid;grid-template-columns:1fr 1fr;gap:8px;overflow:hidden;height:100%;}
+.mini-card{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:9px 10px;display:flex;flex-direction:column;overflow:hidden;height:100%;}
 .mini-h{font-size:10px;font-weight:600;color:var(--text);margin-bottom:1px;}
 .mini-sub{font-size:8.5px;color:var(--muted);margin-bottom:6px;}
 .mini-cv{flex:1;position:relative;min-height:0;}
