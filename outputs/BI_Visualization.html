@@ -249,6 +249,9 @@ html,body{
 .ask-d{font-size:9.5px;color:var(--text2);line-height:1.5;}
 .team-row{display:flex;gap:14px;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);}
 .team-row span{color:var(--text2);}
+/* ── LOGOS ── */
+.nav-logos{display:flex;align-items:center;gap:10px;}
+.s5-logos{display:flex;align-items:center;justify-content:center;gap:28px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);}
 </style>
 </head>
 <body>
@@ -507,12 +510,22 @@ html,body{
     <div class="ask"><div class="ask-t">Ask 03</div><div class="ask-h">Publish a 2027 corridor scorecard</div><div class="ask-d">Adopt Strategic KPI tier as public reporting, anchored on PNIEC 2030.</div></div>
   </div>
   <div class="team-row rv d5"><span style="color:var(--glt);font-size:11px;letter-spacing:.08em;">Los Gatos de Datos</span></div>
+  <div class="s5-logos rv d5">
+    <img src="resources/iberdrola_logo.png" style="height:52px;display:block;" alt="Iberdrola"/>
+    <div style="width:1px;height:52px;background:var(--border2);"></div>
+    <img src="resources/ie_logo.png" style="height:52px;display:block;" alt="IE University"/>
+  </div>
 </div>
 
 <!-- ══ NAV ══ -->
 <div id="nav">
   <div class="nav-brand">
-    <div class="nav-logo">IB</div>
+    <div class="nav-logos">
+      <img src="../resources/iberdrola_logo.png" style="height:24px;display:block;" alt="Iberdrola"/>
+      <div style="width:1px;height:18px;background:var(--border);"></div>
+      <img src="../resources/ie_logo.png" style="height:24px;display:block;" alt="IE University"/>
+    </div>
+    <div style="width:1px;height:18px;background:var(--border);margin:0 4px;"></div>
     <div><div class="nav-name">Spain EV 2027 | Iberdrola rollout</div><div class="nav-sub">IE Datathon 2026 / Team Submission / v1.0</div></div>
   </div>
   <div class="nav-tabs">
