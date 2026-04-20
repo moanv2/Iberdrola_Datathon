@@ -46,11 +46,11 @@ html,body{
 #prog{position:absolute;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--g),var(--b));z-index:99;transition:width .5s ease;}
 
 /* ── NAV ── */
-#nav{position:absolute;bottom:0;left:0;right:0;height:44px;background:rgba(6,11,8,.97);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;z-index:99;backdrop-filter:blur(12px);}
-.nav-brand{display:flex;align-items:center;gap:9px;}
+#nav{position:absolute;bottom:0;left:0;right:0;height:44px;background:rgba(6,11,8,.97);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 10px;z-index:99;backdrop-filter:blur(12px);overflow:hidden;}
+.nav-brand{display:flex;align-items:center;gap:6px;flex-shrink:0;}
 .nav-logo{width:22px;height:22px;border-radius:4px;background:var(--g);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:600;color:#fff;}
-.nav-name{font-size:11px;font-weight:600;color:var(--text);}
-.nav-sub{font-family:'JetBrains Mono',monospace;font-size:7.5px;color:var(--muted);}
+.nav-name{font-size:10px;font-weight:600;color:var(--text);white-space:nowrap;line-height:1.2;}
+.nav-sub{font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--muted);white-space:nowrap;line-height:1.2;}
 .nav-tabs{display:flex;gap:3px;}
 .tab{height:26px;padding:0 11px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:9.5px;font-weight:500;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px;white-space:nowrap;font-family:'Inter',sans-serif;}
 .tab:hover{border-color:var(--g);color:var(--text);}
@@ -511,9 +511,9 @@ html,body{
   </div>
   <div class="team-row rv d5"><span style="color:var(--glt);font-size:11px;letter-spacing:.08em;">Los Gatos de Datos</span></div>
   <div class="s5-logos rv d5">
-    <img src="resources/iberdrola_logo.png" style="height:52px;display:block;" alt="Iberdrola"/>
+    <img src="../logos/iberdrola_logo.png" style="height:52px;display:block;" alt="Iberdrola"/>
     <div style="width:1px;height:52px;background:var(--border2);"></div>
-    <img src="resources/ie_logo.png" style="height:52px;display:block;" alt="IE University"/>
+    <img src="../logos/ie_logo.png" style="height:52px;display:block;" alt="IE University"/>
   </div>
 </div>
 
