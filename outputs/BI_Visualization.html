@@ -1,384 +1,518 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Iberdrola EV Charging Network 2027</title>
-  
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; }
-    
-    #header {
-      background: #003087; /* Iberdrola dark blue */
-      color: white;
-      padding: 12px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    #header h1 { font-size: 18px; }
-    
-    #kpi-bar {
-      background: #f5f5f5;
-      border-bottom: 1px solid #ddd;
-      padding: 8px 20px;
-      display: flex;
-      gap: 40px;
-    }
-    
-    .kpi {
-      text-align: center;
-    }
-    
-    .kpi-value {
-      font-size: 22px;
-      font-weight: bold;
-      color: #003087;
-    }
-    
-    .kpi-label {
-      font-size: 11px;
-      color: #666;
-    }
-    
-    #controls {
-      background: white;
-      padding: 8px 20px;
-      border-bottom: 1px solid #ddd;
-      display: flex;
-      gap: 16px;
-      align-items: center;
-    }
-    
-    #controls label {
-      font-size: 13px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    
-    #map {
-      height: calc(100vh - 130px);
-      width: 100%;
-    }
-    
-    #legend {
-      background: white;
-      padding: 10px 14px;
-      border-radius: 6px;
-      box-shadow: 0 1px 5px rgba(0,0,0,0.3);
-      line-height: 24px;
-      font-size: 13px;
-    }
-    
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .legend-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      display: inline-block;
-    }
-  </style>
+<meta charset="UTF-8"/>
+<title>Iberdrola EV 2027 | Pitch</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#060b08;--bg2:#0b1510;
+  --card:#0e1711;--card2:#121e15;
+  --border:#1a2c1e;--border2:#243329;
+  --text:#e2ede5;--text2:#b5cebb;--muted:#5e7d65;--faint:#2c412f;
+  --g:#00a443;--g2:#00c44f;--g3:#008c38;--glt:#3FC37A;
+  --o:#F39200;--r:#D7263D;--ok:#2A9D8F;--b:#009EE0;
+}
+
+/* ── TRUE 16:9 FRAME ── */
+html,body{
+  margin:0;padding:0;width:100%;height:100%;
+  background:#000;
+  font-family:'Inter',sans-serif;
+  overflow:hidden;
+}
+#frame{
+  position:absolute;
+  top:50%;left:50%;
+  width:min(100vw, calc(100vh * 16 / 9));
+  height:min(100vh, calc(100vw * 9 / 16));
+  transform:translate(-50%,-50%);
+  overflow:hidden;
+  background:var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  font-size:clamp(10px, 1.2vw, 16px);
+}
+
+/* ── SLIDES ── */
+.slide{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .55s cubic-bezier(.4,0,.2,1),transform .55s cubic-bezier(.4,0,.2,1);transform:translateY(28px);background:var(--bg);}
+.slide.active{opacity:1;pointer-events:all;transform:translateY(0);}
+.slide.above{opacity:0;transform:translateY(-28px);}
+
+/* ── PROGRESS ── */
+#prog{position:absolute;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--g),var(--b));z-index:99;transition:width .5s ease;}
+
+/* ── NAV ── */
+#nav{position:absolute;bottom:0;left:0;right:0;height:44px;background:rgba(6,11,8,.97);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;z-index:99;backdrop-filter:blur(12px);}
+.nav-brand{display:flex;align-items:center;gap:9px;}
+.nav-logo{width:22px;height:22px;border-radius:4px;background:var(--g);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:600;color:#fff;}
+.nav-name{font-size:11px;font-weight:600;color:var(--text);}
+.nav-sub{font-family:'JetBrains Mono',monospace;font-size:7.5px;color:var(--muted);}
+.nav-tabs{display:flex;gap:3px;}
+.tab{height:26px;padding:0 11px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:9.5px;font-weight:500;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px;white-space:nowrap;font-family:'Inter',sans-serif;}
+.tab:hover{border-color:var(--g);color:var(--text);}
+.tab.on{background:var(--g);border-color:var(--g);color:#fff;font-weight:600;}
+.tab-dot{width:4px;height:4px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.nav-pg{display:flex;align-items:center;gap:7px;}
+.arr{width:26px;height:26px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.arr:hover{border-color:var(--g);color:var(--g);}
+.pgn{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--muted);min-width:34px;text-align:center;}
+
+/* ── REVEAL ── */
+.rv{opacity:0;transform:translateY(12px);transition:opacity .5s ease,transform .5s ease;}
+.rv.in{opacity:1;transform:translateY(0);}
+.d1{transition-delay:.05s;}.d2{transition-delay:.13s;}.d3{transition-delay:.21s;}.d4{transition-delay:.29s;}.d5{transition-delay:.37s;}
+
+/* ── SHARED ── */
+.eyerow{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--g);font-weight:600;}
+.eye-dot{width:5px;height:5px;border-radius:50%;background:var(--g);animation:pulse 2.4s infinite;flex-shrink:0;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,164,67,.55);}50%{box-shadow:0 0 0 7px rgba(0,164,67,0);}}
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(0,164,67,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,164,67,.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;}
+.orb{position:absolute;border-radius:50%;pointer-events:none;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;}
+.slide-top{display:flex;align-items:center;justify-content:space-between;padding:0 28px;border-bottom:1px solid var(--border);background:rgba(6,11,8,.92);backdrop-filter:blur(10px);flex-shrink:0;}
+.top-title{font-size:12px;font-weight:600;color:var(--text);}
+.top-title .acc{color:var(--g);}
+.kpi-strip{display:flex;}
+.ks-item{padding:0 14px;border-left:1px solid var(--border);text-align:right;}
+.ks-v{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;color:var(--text);}
+.ks-v.g{color:var(--g);}
+.ks-v.r{color:var(--r);}
+.ks-l{font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:1px;}
+
+/* ════════════════════════════
+   S1 — CONTEXT
+════════════════════════════ */
+#s1{display:grid;grid-template-columns:1fr 1fr;}
+.s1-orb{width:700px;height:700px;background:radial-gradient(circle,rgba(0,164,67,.12) 0%,rgba(0,164,67,.04) 40%,transparent 68%);top:50%;right:-14%;transform:translateY(-50%);animation:breathe 5s ease-in-out infinite;}
+@keyframes breathe{0%,100%{transform:translateY(-50%) scale(1);}50%{transform:translateY(-50%) scale(1.06);}}
+.s1-ring{position:absolute;border-radius:50%;border:1px solid rgba(0,164,67,.07);animation:ring-out 8s linear infinite;top:50%;right:12%;transform:translate(50%,-50%);}
+@keyframes ring-out{0%{width:30px;height:30px;opacity:.8;}100%{width:900px;height:900px;opacity:0;}}
+
+.s1-left{position:relative;z-index:2;padding:52px 40px 44px 56px;display:flex;flex-direction:column;justify-content:center;}
+.s1-h{font-size:52px;font-weight:800;line-height:.95;letter-spacing:-.04em;margin:16px 0 18px;}
+.s1-h .em{color:var(--g);}
+.s1-h .di{color:var(--muted);font-weight:300;}
+.s1-hook{font-size:13px;color:var(--text2);line-height:1.65;max-width:440px;margin-bottom:28px;}
+.s1-hook b{color:var(--text);}
+.s1-meta{display:flex;gap:0;padding-top:18px;border-top:1px solid var(--border);}
+.s1-mi{flex:1;}
+.s1-mi+.s1-mi{padding-left:18px;border-left:1px solid var(--border);}
+.s1-ml{font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+.s1-mv{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--text2);}
+
+.s1-right{position:relative;z-index:2;background:linear-gradient(150deg,var(--bg2) 0%,var(--bg) 100%);border-left:1px solid var(--border);padding:44px 36px;display:flex;flex-direction:column;justify-content:center;}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.hk{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px 14px;transition:border-color .25s;}
+.hk:hover{border-color:rgba(0,164,67,.4);}
+.hk.lead{grid-column:1/-1;background:linear-gradient(130deg,rgba(0,164,67,.12),rgba(0,164,67,.03));border-color:rgba(0,164,67,.32);}
+.hk-v{font-size:36px;font-weight:800;line-height:1;letter-spacing:-.04em;color:var(--text);}
+.hk-v.big{font-size:44px;color:var(--glt);}
+.hk-v .u{font-size:13px;color:var(--muted);font-weight:400;margin-left:3px;}
+.hk-l{font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:6px;}
+
+/* ════════════════════════════
+   S2 — CHARGING NETWORK
+════════════════════════════ */
+#s2{display:grid;grid-template-rows:52px 1fr;}
+.s2-body{display:grid;grid-template-columns:1.1fr 1fr;height:100%;}
+.s2-map{position:relative;display:flex;align-items:center;justify-content:center;border-right:1px solid var(--border);overflow:hidden;}
+.map-ph{position:relative;z-index:2;text-align:center;padding:20px 28px;}
+.map-icon{width:58px;height:58px;border-radius:50%;border:1px solid var(--border2);background:var(--card);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:22px;}
+.map-t{font-size:12px;font-weight:600;color:var(--text);margin-bottom:5px;}
+.map-d{font-size:10px;color:var(--text2);line-height:1.6;max-width:290px;}
+.leg-row{display:flex;gap:10px;margin-top:14px;justify-content:center;flex-wrap:wrap;}
+.lg{display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text2);}
+.lgd{width:8px;height:8px;border-radius:50%;border:1.5px solid rgba(255,255,255,.1);flex-shrink:0;}
+.lgl{width:12px;height:2.5px;border-radius:1px;flex-shrink:0;}
+.map-cta{margin-top:14px;display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:5px;background:rgba(0,164,67,.1);border:1px solid rgba(0,164,67,.25);font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--glt);}
+
+.s2-right{padding:14px 18px;display:flex;flex-direction:column;gap:11px;}
+.ct{font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.hbar-wrap{display:flex;flex-direction:column;gap:5px;}
+.hbar-row{display:grid;grid-template-columns:34px 1fr 38px;align-items:center;gap:7px;}
+.hbar-name{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--text2);font-weight:500;}
+.hbar-track{height:11px;background:var(--faint);border-radius:2px;overflow:hidden;}
+.hbar-fill{height:100%;border-radius:2px;transition:width 1s cubic-bezier(.23,1,.32,1);}
+.hbar-val{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--muted);text-align:right;}
+.method-box{background:var(--card2);border:1px solid var(--border);border-radius:7px;padding:10px 12px;}
+.method-h{font-size:10px;font-weight:600;color:var(--glt);margin-bottom:8px;}
+.method-step{display:flex;gap:8px;padding:5px 0;border-bottom:1px dashed var(--border);font-size:9.5px;color:var(--text2);line-height:1.45;}
+.method-step:last-child{border:none;padding-bottom:0;}
+.method-step b{color:var(--text);font-weight:600;}
+.method-n{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--g);font-weight:600;min-width:18px;flex-shrink:0;}
+
+/* ════════════════════════════
+   S3 — GRID VIABILITY
+════════════════════════════ */
+#s3{display:grid;grid-template-rows:52px 1fr;}
+.s3-body{display:grid;grid-template-columns:1.05fr 1fr;height:100%;overflow:hidden;}
+.s3-left{padding:14px 18px 14px 24px;display:flex;flex-direction:column;gap:10px;border-right:1px solid var(--border);overflow:hidden;}
+.s3-desc{font-size:10px;color:var(--text2);line-height:1.6;}
+.s3-desc b{color:var(--text);}
+.zt{background:var(--card);border:1px solid var(--border);border-radius:7px;overflow:hidden;flex:1;display:flex;flex-direction:column;}
+.zt-hdr{display:grid;grid-template-columns:24px 1.7fr .9fr .65fr .65fr .8fr;padding:6px 10px;border-bottom:1px solid var(--border);background:var(--card2);font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);gap:4px;}
+.zt-body{overflow-y:auto;flex:1;}
+.zt-row{display:grid;grid-template-columns:24px 1.7fr .9fr .65fr .65fr .8fr;padding:6px 10px;border-bottom:1px solid var(--border);font-size:9.5px;color:var(--text2);gap:4px;align-items:center;transition:background .1s;}
+.zt-row:last-child{border:none;}
+.zt-row:hover{background:var(--card2);}
+.zt-rk{font-family:'JetBrains Mono',monospace;color:var(--g);font-weight:600;font-size:9px;}
+.zt-mun{color:var(--text);font-weight:500;font-size:9px;}
+.zt-sub{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--muted);}
+.zt-def{font-family:'JetBrains Mono',monospace;color:var(--r);font-weight:600;font-size:9px;}
+.zt-pr{font-family:'JetBrains Mono',monospace;color:var(--text);font-weight:600;font-size:9px;}
+
+.s3-right{padding:14px 18px;display:grid;grid-template-rows:auto 1fr 1fr;gap:10px;overflow:hidden;}
+.dist-card{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:10px 12px;}
+.card-hdr{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;}
+.card-t{font-size:10.5px;font-weight:600;color:var(--text);}
+.card-tag{font-family:'JetBrains Mono',monospace;font-size:7.5px;color:var(--muted);letter-spacing:.09em;text-transform:uppercase;}
+.db-row{display:grid;grid-template-columns:46px 1fr 78px;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:10px;}
+.db-row:last-child{border:none;}
+.db-name{color:var(--text);font-weight:600;}
+.db-bar{height:9px;background:var(--faint);border-radius:2px;overflow:hidden;}
+.db-fill{height:100%;border-radius:2px;}
+.db-val{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--text2);text-align:right;}
+.mini-charts{display:grid;grid-template-columns:1fr 1fr;gap:8px;overflow:hidden;}
+.mini-card{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:9px 10px;display:flex;flex-direction:column;overflow:hidden;}
+.mini-h{font-size:10px;font-weight:600;color:var(--text);margin-bottom:1px;}
+.mini-sub{font-size:8.5px;color:var(--muted);margin-bottom:6px;}
+.mini-cv{flex:1;position:relative;min-height:0;}
+
+/* ════════════════════════════
+   S4 — KPI + ROADMAP
+════════════════════════════ */
+#s4{display:grid;grid-template-rows:52px 1fr;}
+.s4-body{display:grid;grid-template-columns:1fr 1fr 1fr;height:100%;overflow:hidden;}
+.s4-col{padding:14px 16px 14px 20px;display:flex;flex-direction:column;gap:7px;overflow-y:auto;border-right:1px solid var(--border);}
+.s4-col:last-child{border:none;}
+.s4-col-h{font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;margin-bottom:2px;}
+.s4-col-h .nm{font-family:'JetBrains Mono',monospace;font-size:9px;background:var(--g);color:#fff;padding:1px 6px;border-radius:3px;font-weight:700;}
+.s4-lead{font-size:9.5px;color:var(--muted);line-height:1.5;margin-bottom:6px;}
+.kpi-mini{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:9px 11px;}
+.kpi-mini-h{font-size:9.5px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.kpi-mini-v{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--glt);font-weight:600;margin:2px 0;}
+.kpi-mini-d{font-size:8.5px;color:var(--muted);line-height:1.45;}
+.roadmap-box{margin-top:4px;display:flex;flex-direction:column;gap:7px;}
+.phase{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:9px 12px 9px 18px;position:relative;}
+.phase::before{content:'';position:absolute;left:9px;top:12px;bottom:12px;width:2px;background:var(--g);}
+.phase-h{font-size:10px;font-weight:600;color:var(--text);display:flex;justify-content:space-between;gap:6px;margin-bottom:3px;flex-wrap:wrap;}
+.phase-t{font-family:'JetBrains Mono',monospace;color:var(--g);font-size:8px;}
+.phase-d{font-size:8.5px;color:var(--text2);line-height:1.5;}
+
+/* ════════════════════════════
+   S5 — CLOSE
+════════════════════════════ */
+#s5{display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 72px;text-align:center;position:relative;}
+.s5-orb{width:700px;height:700px;background:radial-gradient(circle,rgba(0,164,67,.08) 0%,transparent 60%);bottom:-280px;right:-120px;}
+.s5-h{font-size:44px;font-weight:800;line-height:1.02;letter-spacing:-.04em;margin:12px 0 14px;max-width:900px;}
+.s5-h .em{color:var(--g);}
+.s5-sub{font-size:12.5px;color:var(--text2);line-height:1.65;max-width:660px;margin-bottom:26px;}
+.s5-sub b{color:var(--text);}
+.asks{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;max-width:900px;width:100%;margin-bottom:22px;}
+.ask{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 13px;text-align:left;}
+.ask-t{font-family:'JetBrains Mono',monospace;font-size:7.5px;color:var(--g);letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px;font-weight:600;}
+.ask-h{font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:5px;line-height:1.3;}
+.ask-d{font-size:9.5px;color:var(--text2);line-height:1.5;}
+.team-row{display:flex;gap:14px;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);}
+.team-row span{color:var(--text2);}
+</style>
 </head>
-
 <body>
+<div id="frame">
+<div id="prog" style="width:20%"></div>
 
-<!-- HEADER -->
-<div id="header">
-  <h1>⚡ Iberdrola EV Charging Network — Spain 2027</h1>
-  <span style="font-size:13px; opacity:0.8">IE Sustainability Datathon March 2026</span>
+<!-- ══ S1: CONTEXT ══ -->
+<div class="slide active" id="s1">
+  <div class="grid-bg"></div>
+  <div class="orb s1-orb"></div>
+  <div class="s1-ring" style="animation-delay:0s"></div>
+  <div class="s1-ring" style="animation-delay:2.7s"></div>
+
+  <div class="s1-left">
+    <div class="eyerow rv d1"><span class="eye-dot"></span>IE Iberdrola Datathon 2026 / Team Submission</div>
+    <h1 class="s1-h rv d2">
+      From <span class="em">52k</span> to <span class="em">614k</span><br/>
+      BEVs by <span class="di">2027.</span>
+    </h1>
+    <p class="s1-hook rv d3">Spain's corridor rollout <b>has a grid problem</b>. The binding constraint is not the charger — it is the feeder behind it.</p>
+    <div class="s1-meta rv d4">
+      <div class="s1-mi"><div class="s1-ml">Sources</div><div class="s1-mv">DGT · CNIG · DGT NAP · 7 DSO R1</div></div>
+      <div class="s1-mi"><div class="s1-ml">Scope</div><div class="s1-mv">52 provinces · 19 corridors · 35 grid zones</div></div>
+      <div class="s1-mi"><div class="s1-ml">Forecast</div><div class="s1-mv">SARIMA(1,1,1) · 134 DGT microdata files</div></div>
+    </div>
+  </div>
+
+  <div class="s1-right">
+    <div class="hero-grid">
+      <div class="hk lead rv d1">
+        <div class="hk-v big">614,412<span class="u">BEVs</span></div>
+        <div class="hk-l">EV fleet projected for 2027</div>
+      </div>
+      <div class="hk rv d2">
+        <div class="hk-v">19</div>
+        <div class="hk-l">Proposed stations</div>
+      </div>
+      <div class="hk rv d3">
+        <div class="hk-v">8,535</div>
+        <div class="hk-l">Existing public chargers</div>
+      </div>
+      <div class="hk rv d4">
+        <div class="hk-v" style="color:var(--r)">15</div>
+        <div class="hk-l">Friction points</div>
+      </div>
+      <div class="hk rv d5">
+        <div class="hk-v" style="color:var(--o)">35</div>
+        <div class="hk-l">Critical grid zones</div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- KPI BAR — fill these numbers from your File 1 -->
-<div id="kpi-bar">
-  <div class="kpi">
-    <div class="kpi-value" id="kpi-proposed">—</div>
-    <div class="kpi-label">Proposed Stations</div>
+<!-- ══ S2: CHARGING NETWORK ══ -->
+<div class="slide" id="s2">
+  <div class="slide-top" style="height:52px;">
+    <div>
+      <div class="eyerow" style="margin-bottom:4px;"><span class="eye-dot"></span>Objective 1 / Charging Network</div>
+      <div class="top-title">19 stations · 152 DC fast chargers · <span class="acc">14 corridors</span></div>
+    </div>
+    <div class="kpi-strip">
+      <div class="ks-item"><div class="ks-v g">19</div><div class="ks-l">Stations</div></div>
+      <div class="ks-item"><div class="ks-v">152</div><div class="ks-l">DCFC units</div></div>
+      <div class="ks-item"><div class="ks-v">22.8 MW</div><div class="ks-l">Committed load</div></div>
+      <div class="ks-item"><div class="ks-v">614,412</div><div class="ks-l">BEVs served</div></div>
+    </div>
   </div>
-  <div class="kpi">
-    <div class="kpi-value" id="kpi-existing">—</div>
-    <div class="kpi-label">Existing Baseline</div>
-  </div>
-  <div class="kpi">
-    <div class="kpi-value" id="kpi-friction">—</div>
-    <div class="kpi-label">Friction Points</div>
-  </div>
-  <div class="kpi">
-    <div class="kpi-value" id="kpi-ev2027">—</div>
-    <div class="kpi-label">Projected EVs 2027</div>
+  <div class="s2-body">
+    <div class="s2-map">
+      <div class="grid-bg"></div>
+      <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:.1;pointer-events:none;" viewBox="0 0 640 480" fill="none">
+        <path d="M80,195 C100,155 135,135 168,124 L215,113 C252,103 290,97 335,92 C380,87 422,86 465,91 C502,96 534,108 558,126 C582,143 596,166 600,192 C604,218 598,244 582,264 C564,285 536,298 506,307 C476,316 442,319 408,318 C374,317 338,312 304,301 C270,290 237,274 210,255 C182,236 160,214 140,198 C120,182 98,178 80,195Z" fill="#00a443"/>
+        <circle cx="160" cy="238" r="6" fill="#D7263D"/><circle cx="305" cy="190" r="6" fill="#D7263D"/>
+        <circle cx="255" cy="248" r="6" fill="#F39200"/><circle cx="330" cy="172" r="6" fill="#F39200"/>
+        <circle cx="380" cy="252" r="6" fill="#F39200"/><circle cx="420" cy="204" r="6" fill="#F39200"/>
+        <circle cx="335" cy="218" r="6" fill="#F39200"/><circle cx="278" cy="168" r="6" fill="#F39200"/>
+        <circle cx="440" cy="242" r="6" fill="#F39200"/><circle cx="392" cy="172" r="6" fill="#F39200"/>
+        <circle cx="480" cy="228" r="6" fill="#2A9D8F"/><circle cx="508" cy="206" r="6" fill="#2A9D8F"/>
+        <circle cx="202" cy="216" r="6" fill="#2A9D8F"/><circle cx="450" cy="183" r="6" fill="#2A9D8F"/>
+        <line x1="340" y1="200" x2="160" y2="238" stroke="#3FC37A" stroke-width="1.5" opacity=".5"/>
+        <line x1="340" y1="200" x2="255" y2="248" stroke="#3FC37A" stroke-width="1.8" opacity=".5"/>
+        <line x1="340" y1="200" x2="480" y2="228" stroke="#3FC37A" stroke-width="1.8" opacity=".5"/>
+        <line x1="340" y1="200" x2="420" y2="130" stroke="#3FC37A" stroke-width="1.5" opacity=".4"/>
+        <line x1="340" y1="200" x2="200" y2="130" stroke="#3FC37A" stroke-width="1.5" opacity=".35"/>
+        <line x1="340" y1="200" x2="420" y2="280" stroke="#3FC37A" stroke-width="1.3" opacity=".35"/>
+      </svg>
+      <div class="map-ph">
+        <div class="map-icon">🗺️</div>
+        <div class="map-t">Interactive Map · Live HTML Dashboard</div>
+        <div class="map-d">19 stations across Spain colour-coded by grid status.<br/>Corridors weighted by 2027 peak daily sessions.</div>
+        <div class="leg-row">
+          <div class="lg"><div class="lgd" style="background:var(--r)"></div>Congested (4 ch)</div>
+          <div class="lg"><div class="lgd" style="background:var(--o)"></div>Moderate (8 ch)</div>
+          <div class="lg"><div class="lgd" style="background:var(--ok)"></div>Sufficient (12–16 ch)</div>
+        </div>
+        <div class="leg-row" style="margin-top:4px;">
+          <div class="lg"><div class="lgl" style="background:var(--glt)"></div>High demand corridor</div>
+          <div class="lg"><div class="lgl" style="background:var(--faint)"></div>Lower demand</div>
+        </div>
+        <div class="map-cta">▶ Insert screen recording here</div>
+      </div>
+    </div>
+    <div class="s2-right">
+      <div class="card" style="padding:11px 13px;">
+        <div class="ct">Top 10 corridors · peak daily sessions 2027</div>
+        <div class="hbar-wrap" id="corridorBars"></div>
+      </div>
+      <div class="method-box">
+        <div class="method-h">Method · 4 steps</div>
+        <div class="method-step"><span class="method-n">01</span><span><b>Road spine</b> — CNIG interurban layer, 19 corridors, 90% of traffic</span></div>
+        <div class="method-step"><span class="method-n">02</span><span><b>Fleet forecast</b> — SARIMA, 614,412 BEVs, 20% long distance</span></div>
+        <div class="method-step"><span class="method-n">03</span><span><b>Demand allocation</b> — AP-7 traffic share, sessions/km</span></div>
+        <div class="method-step"><span class="method-n">04</span><span><b>Station placement</b> — greedy siting, gaps &gt;60 km</span></div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- LAYER TOGGLES -->
-<div id="controls">
-  <strong style="font-size:13px">Layers:</strong>
-  <label><input type="checkbox" id="toggle-stations" checked> Charging Stations</label>
-  <label><input type="checkbox" id="toggle-friction" checked> Friction Points</label>
-  <label>
-    Filter grid status:
-    <select id="filter-status">
-      <option value="all">All</option>
-      <option value="Sufficient">Sufficient only</option>
-      <option value="Moderate">Moderate only</option>
-      <option value="Congested">Congested only</option>
-    </select>
-  </label>
+<!-- ══ S3: GRID VIABILITY ══ -->
+<div class="slide" id="s3">
+  <div class="slide-top" style="height:52px;">
+    <div>
+      <div class="eyerow" style="margin-bottom:4px;"><span class="eye-dot"></span>Objective 2 / Grid Viability Analysis</div>
+      <div class="top-title">35 critical zones · 14 friction points · <span class="acc">i-DE carries 74%</span> of placements</div>
+    </div>
+    <div class="kpi-strip">
+      <div class="ks-item"><div class="ks-v">35</div><div class="ks-l">Critical zones</div></div>
+      <div class="ks-item"><div class="ks-v">14</div><div class="ks-l">Friction points</div></div>
+      <div class="ks-item"><div class="ks-v g">22.8 MW</div><div class="ks-l">New load committed</div></div>
+      <div class="ks-item"><div class="ks-v r">4.5 MW</div><div class="ks-l">Capacity shortfall</div></div>
+    </div>
+  </div>
+  <div class="s3-body">
+    <div class="s3-left">
+      <div class="s3-desc">Each critical zone is a DSO substation within 20 km of a high-demand corridor with firm capacity below projected session load. Top zones cluster on <b>A-6 (León)</b> and <b>Madrid radials A-1, A-3, A-4</b>.</div>
+      <div class="zt">
+        <div class="zt-hdr"><div>#</div><div>Municipality</div><div>Substation</div><div>Corridor</div><div>Deficit</div><div>Priority</div></div>
+        <div class="zt-body" id="zonesBody"></div>
+      </div>
+    </div>
+    <div class="s3-right">
+      <div class="dist-card">
+        <div class="card-hdr"><div class="card-t">Distributor share of proposed stations</div><div class="card-tag">19 sites</div></div>
+        <div id="distBars"></div>
+      </div>
+      <div class="mini-charts">
+        <div class="mini-card"><div class="mini-h">Grid status mix</div><div class="mini-sub">3 tiers by firm capacity</div><div class="mini-cv"><canvas id="statusChart"></canvas></div></div>
+        <div class="mini-card"><div class="mini-h">Tier sizing</div><div class="mini-sub">Chargers per station</div><div class="mini-cv"><canvas id="tierChart"></canvas></div></div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- MAP -->
-<div id="map"></div>
+<!-- ══ S4: KPI + ROADMAP ══ -->
+<div class="slide" id="s4">
+  <div class="slide-top" style="height:52px;">
+    <div>
+      <div class="eyerow" style="margin-bottom:4px;"><span class="eye-dot"></span>Playbook / KPI Framework · 18-Month Roadmap</div>
+      <div class="top-title">Three tiers of KPI · <span class="acc">one plan to pitch the board</span></div>
+    </div>
+    <div class="kpi-strip">
+      <div class="ks-item"><div class="ks-v g">18</div><div class="ks-l">Month roadmap</div></div>
+      <div class="ks-item"><div class="ks-v">3</div><div class="ks-l">KPI tiers</div></div>
+      <div class="ks-item"><div class="ks-v">€180M</div><div class="ks-l">Indicative capex</div></div>
+    </div>
+  </div>
+  <div class="s4-body">
+    <div class="s4-col">
+      <div class="s4-col-h"><span class="nm">S</span>Strategic KPIs</div>
+      <p class="s4-lead">Board-facing. Tied to FY27 EV objectives and PNIEC 2030.</p>
+      <div class="kpi-mini"><div class="kpi-mini-h">Corridor coverage ratio</div><div class="kpi-mini-v">100% of 19 corridors by Q4 2027</div><div class="kpi-mini-d">≥1 Iberdrola DCFC within 60 km spacing.</div></div>
+      <div class="kpi-mini"><div class="kpi-mini-h">Grid readiness index</div><div class="kpi-mini-v">85% sites Moderate or Sufficient</div><div class="kpi-mini-d">Baseline 21%.</div></div>
+      <div class="kpi-mini"><div class="kpi-mini-h">i-DE load share captured</div><div class="kpi-mini-v">18.6 MW activated on i-DE by 2027</div><div class="kpi-mini-d">14 of 19 sites on i-DE feeders.</div></div>
+      <div class="kpi-mini"><div class="kpi-mini-h">Revenue per kWh</div><div class="kpi-mini-v">Benchmark vs. fast charging market</div><div class="kpi-mini-d">Net margin after wholesale, network fees, OPEX.</div></div>
+    </div>
+    <div class="s4-col">
+      <div class="s4-col-h"><span class="nm">O</span>Operational KPIs</div>
+      <p class="s4-lead">Network planning. Track weekly, escalate on breach.</p>
+      <div class="kpi-mini"><div class="kpi-mini-h">Critical zone burndown</div><div class="kpi-mini-v">35 zones → 0 by Q2 2028</div></div>
+      <div class="kpi-mini"><div class="kpi-mini-h">Friction point resolution</div><div class="kpi-mini-v">14 open → target 3 by Q4 2026</div></div>
+      <div class="kpi-mini"><div class="kpi-mini-h">Mean deficit MW per site</div><div class="kpi-mini-v">0.3 MW → target &lt;0.1 MW</div></div>
+      <div class="kpi-mini"><div class="kpi-mini-h">Commissioning lead time</div><div class="kpi-mini-v">Target &lt;12 months siting to energized</div></div>
+      <div class="kpi-mini"><div class="kpi-mini-h">Utilization</div><div class="kpi-mini-v">40% of modelled peak by month 12</div></div>
+    </div>
+    <div class="s4-col">
+      <div class="s4-col-h"><span class="nm">P</span>Portfolio + Roadmap</div>
+      <p class="s4-lead">Asset view + phased deployment.</p>
+      <div class="kpi-mini"><div class="kpi-mini-h">Province concentration</div><div class="kpi-mini-v">Top 5 carry 58% of stations</div><div class="kpi-mini-d">Asturias · Cáceres · Huesca · Lugo · Illes Balears</div></div>
+      <div class="kpi-mini"><div class="kpi-mini-h">Capex at risk</div><div class="kpi-mini-v">€12M tied to 3 congested sites</div></div>
+      <div class="roadmap-box">
+        <div class="phase"><div class="phase-h"><span>Phase 1 · Grid reinforcement lock-in</span><span class="phase-t">Q2–Q4 2026</span></div><div class="phase-d">Submit access requests for 15 priority zones on A-6, A-3, A-4. Lock transformer slots.</div></div>
+        <div class="phase"><div class="phase-h"><span>Phase 2 · Corridor rollout wave one</span><span class="phase-t">Q1–Q3 2027</span></div><div class="phase-d">Energize 12 Moderate and Sufficient sites. Activate 14.4 MW on i-DE.</div></div>
+        <div class="phase"><div class="phase-h"><span>Phase 3 · Congested sites + tier 4</span><span class="phase-t">Q4 2027–Q2 2028</span></div><div class="phase-d">Bring online 3 Congested stations after substation upgrades.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- ══ S5: CLOSE ══ -->
+<div class="slide" id="s5">
+  <div class="grid-bg"></div>
+  <div class="orb s5-orb"></div>
+  <div class="eyerow rv d1" style="margin-bottom:14px;"><span class="eye-dot"></span>Closing / Recommendation</div>
+  <h2 class="s5-h rv d2">Own the <span class="em">corridor and the feeder</span><br/>in the same plan, or lose both.</h2>
+  <p class="s5-sub rv d3">We placed <b>19 stations</b> against a <b>614,412 BEV</b> forecast and found <b>35 zones</b> where firm capacity cannot serve 2027 demand. Fourteen sit on i-DE feeders. One programme converts a compliance cost into an <b>18.6 MW network asset</b>.</p>
+  <div class="asks rv d4">
+    <div class="ask"><div class="ask-t">Ask 01</div><div class="ask-h">Approve 15 priority grid access requests</div><div class="ask-d">R1 access on A-6, A-3, A-4 nodes. Lock transformer slots Q3 2026.</div></div>
+    <div class="ask"><div class="ask-t">Ask 02</div><div class="ask-h">Co-site charging with reinforcement</div><div class="ask-d">Pair 3 Congested sites with reinforcement works — cut commissioning by 6 months.</div></div>
+    <div class="ask"><div class="ask-t">Ask 03</div><div class="ask-h">Publish a 2027 corridor scorecard</div><div class="ask-d">Adopt Strategic KPI tier as public reporting, anchored on PNIEC 2030.</div></div>
+  </div>
+  <div class="team-row rv d5"><span>Diego Alfaro</span><span>Marco</span><span>Gloriana</span><span>Michael</span><span>Claudia</span><span>Cecile</span></div>
+</div>
+
+<!-- ══ NAV ══ -->
+<div id="nav">
+  <div class="nav-brand">
+    <div class="nav-logo">IB</div>
+    <div><div class="nav-name">Spain EV 2027 | Iberdrola rollout</div><div class="nav-sub">IE Datathon 2026 / Team Submission / v1.0</div></div>
+  </div>
+  <div class="nav-tabs">
+    <div class="tab on" data-i="0"><div class="tab-dot"></div>01 Context</div>
+    <div class="tab" data-i="1"><div class="tab-dot"></div>02 Charging network</div>
+    <div class="tab" data-i="2"><div class="tab-dot"></div>03 Grid viability</div>
+    <div class="tab" data-i="3"><div class="tab-dot"></div>04 KPI & plan</div>
+    <div class="tab" data-i="4"><div class="tab-dot"></div>05 Close</div>
+  </div>
+  <div class="nav-pg">
+    <button class="arr" id="prev">&#8592;</button>
+    <div class="pgn" id="pgn">01 / 05</div>
+    <button class="arr" id="next">&#8594;</button>
+  </div>
+</div>
+
+</div><!-- #frame -->
 
 <script>
-
-// ============================================================
-// 1. PASTE YOUR DATA HERE (from File 1, File 2, File 3)
-// ============================================================
-
-const FILE1_KPIS = {
-  total_proposed_stations: 0,      // <- paste from File 1
-  total_existing_stations_baseline: 0,
-  total_friction_points: 0,
-  total_ev_projected_2027: 0
-};
-
-// File 2 — proposed charging stations
-// Copy this format for every row in your File 2
-const FILE2_STATIONS = [
-  {
-    location_id: "IBE_001",
-    latitude: 40.4168,
-    longitude: -3.7038,
-    route_segment: "A-6",
-    n_chargers_proposed: 6,
-    grid_status: "Sufficient"
-  },
-  {
-    location_id: "IBE_002",
-    latitude: 41.3851,
-    longitude: 2.1734,
-    route_segment: "AP-7",
-    n_chargers_proposed: 4,
-    grid_status: "Moderate"
-  },
-  {
-    location_id: "IBE_003",
-    latitude: 37.3891,
-    longitude: -5.9845,
-    route_segment: "A-4",
-    n_chargers_proposed: 8,
-    grid_status: "Congested"
-  },
-  // ... add all your stations here
+const CORRIDORS=[{name:"A-2",peak:43446},{name:"A-4",peak:31149},{name:"A-3",peak:26992},{name:"A-1",peak:25999},{name:"A-6",peak:22733},{name:"A-5",peak:18779},{name:"AP-7",peak:15326},{name:"N-II",peak:14482},{name:"A-7",peak:14452},{name:"N-IV",peak:11794}];
+const ZONES=[
+  {rk:1, mun:"Manises, Illes Balears",   sub:"220007",     cor:"A-4",def:1.01,pr:31461},
+  {rk:2, mun:"Madrid",                   sub:"3307",       cor:"A-1",def:1.00,pr:25999},
+  {rk:3, mun:"València",                 sub:"3547",       cor:"A-3",def:0.94,pr:25373},
+  {rk:4, mun:"Bembibre, León",           sub:"3020310006", cor:"A-6",def:1.12,pr:25365},
+  {rk:5, mun:"València",                 sub:"3547",       cor:"A-3",def:0.74,pr:19974},
+  {rk:6, mun:"Fabero, León",             sub:"3020100002", cor:"A-6",def:0.79,pr:18068},
+  {rk:7, mun:"Fabero, León",             sub:"3020410125", cor:"A-6",def:0.79,pr:18063},
+  {rk:8, mun:"Toreno, León",             sub:"3020300099", cor:"A-6",def:0.79,pr:18046},
+  {rk:9, mun:"Cubillos del Sil, León",   sub:"3020410444", cor:"A-6",def:0.79,pr:17962},
+  {rk:10,mun:"Toral de los Vados, León", sub:"3020310115", cor:"A-6",def:0.62,pr:14187}
 ];
+const DIST=[{n:"i-DE",s:14,mw:18.6,color:"#00a443"},{n:"Viesgo",s:3,mw:3.0,color:"#009EE0"},{n:"Endesa",s:2,mw:2.4,color:"#F39200"}];
 
-// File 3 — friction points (Moderate + Congested only)
-const FILE3_FRICTION = [
-  {
-    bottleneck_id: "FRIC_001",
-    latitude: 41.3851,
-    longitude: 2.1734,
-    route_segment: "AP-7",
-    distributor_network: "i-DE",
-    estimated_demand_kw: 600,
-    grid_status: "Moderate"
-  },
-  // ... add all your friction points here
-];
-
-// ============================================================
-// 2. MAP SETUP
-// ============================================================
-
-const map = L.map('map').setView([40.4, -3.7], 6);
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap contributors'
-}).addTo(map);
-
-// ============================================================
-// 3. COLOR + ICON HELPERS
-// ============================================================
-
-const STATUS_COLORS = {
-  Sufficient: '#2ecc71',   // green
-  Moderate:   '#f39c12',   // yellow/orange
-  Congested:  '#e74c3c'    // red
-};
-
-function stationIcon(status) {
-  const color = STATUS_COLORS[status] || '#999';
-  return L.divIcon({
-    className: '',
-    html: `<div style="
-      width:14px; height:14px;
-      background:${color};
-      border:2px solid white;
-      border-radius:50%;
-      box-shadow:0 1px 4px rgba(0,0,0,0.4);
-    "></div>`,
-    iconSize: [14, 14],
-    iconAnchor: [7, 7]
-  });
-}
-
-function frictionIcon(status) {
-  const color = STATUS_COLORS[status] || '#999';
-  return L.divIcon({
-    className: '',
-    html: `<div style="
-      width:18px; height:18px;
-      background:${color};
-      border:2px solid #333;
-      border-radius:3px;
-      box-shadow:0 1px 4px rgba(0,0,0,0.5);
-      opacity:0.85;
-    "></div>`,
-    iconSize: [18, 18],
-    iconAnchor: [9, 9]
-  });
-}
-
-// ============================================================
-// 4. RENDER STATIONS (File 2) — circles
-// ============================================================
-
-let stationMarkers = [];
-
-function renderStations(filterStatus) {
-  stationMarkers.forEach(m => map.removeLayer(m));
-  stationMarkers = [];
-
-  FILE2_STATIONS.forEach(s => {
-    if (filterStatus !== 'all' && s.grid_status !== filterStatus) return;
-
-    const marker = L.marker([s.latitude, s.longitude], {
-      icon: stationIcon(s.grid_status)
-    }).bindPopup(`
-      <div style="font-size:13px; min-width:180px">
-        <b>${s.location_id}</b><br>
-        <hr style="margin:4px 0">
-        🛣 Route: <b>${s.route_segment}</b><br>
-        ⚡ Chargers: <b>${s.n_chargers_proposed}</b><br>
-        🔋 Demand: <b>${s.n_chargers_proposed * 150} kW</b><br>
-        🟢 Grid status: <b style="color:${STATUS_COLORS[s.grid_status]}">${s.grid_status}</b>
-      </div>
-    `);
-
-    marker.addTo(map);
-    stationMarkers.push(marker);
-  });
-}
-
-// ============================================================
-// 5. RENDER FRICTION POINTS (File 3) — squares
-// ============================================================
-
-let frictionMarkers = [];
-
-function renderFriction() {
-  frictionMarkers.forEach(m => map.removeLayer(m));
-  frictionMarkers = [];
-
-  FILE3_FRICTION.forEach(f => {
-    const marker = L.marker([f.latitude, f.longitude], {
-      icon: frictionIcon(f.grid_status)
-    }).bindPopup(`
-      <div style="font-size:13px; min-width:180px">
-        <b>⚠️ ${f.bottleneck_id}</b><br>
-        <hr style="margin:4px 0">
-        🛣 Route: <b>${f.route_segment}</b><br>
-        🏭 Distributor: <b>${f.distributor_network}</b><br>
-        ⚡ Demand: <b>${f.estimated_demand_kw} kW</b><br>
-        🔴 Status: <b style="color:${STATUS_COLORS[f.grid_status]}">${f.grid_status}</b>
-      </div>
-    `);
-
-    marker.addTo(map);
-    frictionMarkers.push(marker);
-  });
-}
-
-// ============================================================
-// 6. LEGEND
-// ============================================================
-
-const legend = L.control({ position: 'bottomright' });
-legend.onAdd = function() {
-  const div = L.DomUtil.create('div', 'legend');
-  div.id = 'legend';
-  div.innerHTML = `
-    <b style="font-size:13px">Grid Status</b><br><br>
-    <div class="legend-item">
-      <span class="legend-dot" style="background:#2ecc71"></span> Sufficient
-    </div>
-    <div class="legend-item">
-      <span class="legend-dot" style="background:#f39c12"></span> Moderate
-    </div>
-    <div class="legend-item">
-      <span class="legend-dot" style="background:#e74c3c"></span> Congested
-    </div>
-    <br>
-    <div class="legend-item">
-      <span class="legend-dot" style="background:#999"></span> ● Station
-    </div>
-    <div class="legend-item">
-      <span style="display:inline-block;width:12px;height:12px;background:#999;border-radius:2px"></span> ■ Friction point
-    </div>
-  `;
-  return div;
-};
-legend.addTo(map);
-
-// ============================================================
-// 7. CONTROLS (toggles + filter)
-// ============================================================
-
-document.getElementById('toggle-stations').addEventListener('change', function() {
-  const status = document.getElementById('filter-status').value;
-  if (this.checked) renderStations(status);
-  else { stationMarkers.forEach(m => map.removeLayer(m)); stationMarkers = []; }
+// Corridor bars
+const maxP=CORRIDORS[0].peak,cb=document.getElementById('corridorBars');
+CORRIDORS.forEach((c,i)=>{
+  const pct=(c.peak/maxP*100).toFixed(1),clr=i<3?'#00a443':i<6?'#008c38':'#2c412f';
+  cb.innerHTML+=`<div class="hbar-row"><div class="hbar-name">${c.name}</div><div class="hbar-track"><div class="hbar-fill cbfill" style="background:${clr};width:0%" data-w="${pct}%"></div></div><div class="hbar-val">${(c.peak/1000).toFixed(0)}K</div></div>`;
 });
 
-document.getElementById('toggle-friction').addEventListener('change', function() {
-  if (this.checked) renderFriction();
-  else { frictionMarkers.forEach(m => map.removeLayer(m)); frictionMarkers = []; }
+// Zones table
+document.getElementById('zonesBody').innerHTML=ZONES.map(z=>`<div class="zt-row"><div class="zt-rk">${String(z.rk).padStart(2,'0')}</div><div class="zt-mun">${z.mun}</div><div class="zt-sub">${z.sub}</div><div style="font-family:'JetBrains Mono',monospace;font-size:8.5px;">${z.cor}</div><div class="zt-def">${z.def.toFixed(2)}</div><div class="zt-pr">${z.pr.toLocaleString()}</div></div>`).join('');
+
+// Dist bars
+const maxS=14;
+document.getElementById('distBars').innerHTML=DIST.map(d=>`<div class="db-row"><div class="db-name">${d.n}</div><div class="db-bar"><div class="db-fill" style="width:${(d.s/maxS)*100}%;background:${d.color}"></div></div><div class="db-val">${d.s} sites · ${d.mw.toFixed(1)} MW</div></div>`).join('');
+
+// Charts
+Chart.defaults.color='#b5cebb';Chart.defaults.font.family='Inter';Chart.defaults.font.size=9;
+new Chart(document.getElementById('statusChart'),{type:'doughnut',data:{labels:['Moderate','Sufficient','Congested'],datasets:[{data:[12,4,3],backgroundColor:['#F39200','#2A9D8F','#D7263D'],borderColor:'#0e1711',borderWidth:2}]},options:{plugins:{legend:{position:'bottom',labels:{boxWidth:7,padding:6,font:{size:8}}}},cutout:'62%',maintainAspectRatio:false}});
+new Chart(document.getElementById('tierChart'),{type:'doughnut',data:{labels:['Tier 2 (8ch)','Tier 3 (12ch)','Tier 1 (4ch)','Tier 4 (16ch)'],datasets:[{data:[12,3,3,1],backgroundColor:['#00A651','#3FC37A','#006837','#009EE0'],borderColor:'#0e1711',borderWidth:2}]},options:{plugins:{legend:{position:'bottom',labels:{boxWidth:7,padding:6,font:{size:8}}}},cutout:'62%',maintainAspectRatio:false}});
+
+// Slide engine
+const slides=document.querySelectorAll('.slide'),tabs=document.querySelectorAll('.tab');
+let cur=0;
+function go(n){
+  n=Math.max(0,Math.min(4,n));
+  slides.forEach((s,i)=>{s.classList.remove('active','above');if(i===n)s.classList.add('active');else if(i<n)s.classList.add('above');});
+  tabs.forEach(t=>t.classList.toggle('on',+t.dataset.i===n));
+  document.getElementById('pgn').textContent=String(n+1).padStart(2,'0')+' / 05';
+  document.getElementById('prog').style.width=((n+1)/5*100)+'%';
+  const active=document.querySelector('.slide.active');
+  active.querySelectorAll('.rv').forEach(e=>e.classList.remove('in'));
+  setTimeout(()=>active.querySelectorAll('.rv').forEach(e=>e.classList.add('in')),80);
+  if(n===1)setTimeout(()=>document.querySelectorAll('.cbfill').forEach(f=>{f.style.width=f.dataset.w;}),300);
+  cur=n;
+}
+tabs.forEach(t=>t.addEventListener('click',()=>go(+t.dataset.i)));
+document.getElementById('prev').onclick=()=>go(cur-1);
+document.getElementById('next').onclick=()=>go(cur+1);
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){go(cur+1);e.preventDefault();}
+  else if(e.key==='ArrowLeft'||e.key==='PageUp'){go(cur-1);e.preventDefault();}
+  else if(/^[1-5]$/.test(e.key))go(+e.key-1);
 });
-
-document.getElementById('filter-status').addEventListener('change', function() {
-  if (document.getElementById('toggle-stations').checked) {
-    renderStations(this.value);
-  }
-});
-
-// ============================================================
-// 8. KPI BAR — populate from File 1
-// ============================================================
-
-document.getElementById('kpi-proposed').textContent = FILE1_KPIS.total_proposed_stations.toLocaleString();
-document.getElementById('kpi-existing').textContent = FILE1_KPIS.total_existing_stations_baseline.toLocaleString();
-document.getElementById('kpi-friction').textContent = FILE1_KPIS.total_friction_points.toLocaleString();
-document.getElementById('kpi-ev2027').textContent   = FILE1_KPIS.total_ev_projected_2027.toLocaleString();
-
-// ============================================================
-// 9. INITIAL RENDER
-// ============================================================
-
-renderStations('all');
-renderFriction();
-
+setTimeout(()=>document.querySelectorAll('.slide.active .rv').forEach(e=>e.classList.add('in')),100);
 </script>
 </body>
 </html>
