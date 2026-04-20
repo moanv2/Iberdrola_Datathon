@@ -347,35 +347,39 @@ html,body{
         <div class="map-t">Interactive Map · Live HTML Dashboard</div>
         <div class="map-d">19 stations across Spain colour-coded by grid status.<br/>Corridors weighted by 2027 peak daily sessions.</div>
 
-        <!-- COLOR-CODED LEGEND PILLS -->
-        <div style="display:flex;gap:8px;margin-top:14px;justify-content:center;flex-wrap:wrap;">
-          <div style="display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:20px;background:rgba(215,38,61,.15);border:1px solid rgba(215,38,61,.4);">
-            <div style="width:8px;height:8px;border-radius:50%;background:#D7263D;box-shadow:0 0 6px rgba(215,38,61,.9);flex-shrink:0;"></div>
-            <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#D7263D;font-weight:600;">Congested</span>
-            <span style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--muted);">3 · 4ch</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:20px;background:rgba(243,146,0,.12);border:1px solid rgba(243,146,0,.4);">
-            <div style="width:8px;height:8px;border-radius:50%;background:#F39200;box-shadow:0 0 6px rgba(243,146,0,.9);flex-shrink:0;"></div>
-            <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#F39200;font-weight:600;">Moderate</span>
-            <span style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--muted);">12 · 8ch</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:20px;background:rgba(42,157,143,.12);border:1px solid rgba(42,157,143,.4);">
-            <div style="width:8px;height:8px;border-radius:50%;background:#2A9D8F;box-shadow:0 0 6px rgba(42,157,143,.9);flex-shrink:0;"></div>
-            <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#2A9D8F;font-weight:600;">Sufficient</span>
-            <span style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--muted);">4 · 12–16ch</span>
-          </div>
-        </div>
-
-        <!-- CORRIDOR DEMAND LINE -->
-        <div style="display:flex;gap:10px;margin-top:8px;justify-content:center;flex-wrap:wrap;">
-          <div class="lg"><div class="lgl" style="background:var(--glt)"></div>High demand corridor</div>
-          <div class="lg"><div class="lgl" style="background:var(--faint)"></div>Lower demand</div>
-        </div>
-
         <div class="map-cta">▶ Insert screen recording here</div>
       </div>
     </div>
     <div class="s2-right">
+      <!-- MAP LEGEND -->
+      <div class="card" style="padding:10px 12px;">
+        <div class="ct" style="margin-bottom:8px;">Map legend · grid status</div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;background:rgba(215,38,61,.1);border:1px solid rgba(215,38,61,.35);">
+            <div style="width:9px;height:9px;border-radius:50%;background:#D7263D;box-shadow:0 0 5px rgba(215,38,61,.9);flex-shrink:0;"></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:8.5px;color:#D7263D;font-weight:600;">Congested</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:7.5px;color:var(--muted);margin-left:auto;">3 stations · 4 ch</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;background:rgba(243,146,0,.1);border:1px solid rgba(243,146,0,.35);">
+            <div style="width:9px;height:9px;border-radius:50%;background:#F39200;box-shadow:0 0 5px rgba(243,146,0,.9);flex-shrink:0;"></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:8.5px;color:#F39200;font-weight:600;">Moderate</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:7.5px;color:var(--muted);margin-left:auto;">12 stations · 8 ch</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;background:rgba(42,157,143,.1);border:1px solid rgba(42,157,143,.35);">
+            <div style="width:9px;height:9px;border-radius:50%;background:#2A9D8F;box-shadow:0 0 5px rgba(42,157,143,.9);flex-shrink:0;"></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:8.5px;color:#2A9D8F;font-weight:600;">Sufficient</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:7.5px;color:var(--muted);margin-left:auto;">4 stations · 12–16 ch</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;background:var(--card2);border:1px solid var(--border);margin-top:2px;">
+            <div style="width:12px;height:12px;border-radius:50%;border:1.5px solid rgba(243,146,0,.6);animation:pulse 2.4s infinite;flex-shrink:0;"></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:7.5px;color:var(--muted);">Pulsating ring = grid friction point</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;background:var(--card2);border:1px solid var(--border);">
+            <div class="lgl" style="background:var(--glt);flex-shrink:0;"></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:7.5px;color:var(--muted);">Line width = corridor demand</span>
+          </div>
+        </div>
+      </div>
       <div class="card" style="padding:11px 13px;">
         <div class="ct">Top 10 corridors · peak daily sessions 2027</div>
         <div class="hbar-wrap" id="corridorBars"></div>
