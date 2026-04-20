@@ -324,45 +324,56 @@ html,body{
     </div>
   </div>
   <div class="s2-body">
-    <div class="s2-map" style="flex-direction:column;align-items:stretch;padding:14px 18px;gap:10px;">
+    <div class="s2-map">
       <div class="grid-bg"></div>
+      <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:.1;pointer-events:none;" viewBox="0 0 640 480" fill="none">
+        <path d="M80,195 C100,155 135,135 168,124 L215,113 C252,103 290,97 335,92 C380,87 422,86 465,91 C502,96 534,108 558,126 C582,143 596,166 600,192 C604,218 598,244 582,264 C564,285 536,298 506,307 C476,316 442,319 408,318 C374,317 338,312 304,301 C270,290 237,274 210,255 C182,236 160,214 140,198 C120,182 98,178 80,195Z" fill="#00a443"/>
+        <circle cx="160" cy="238" r="6" fill="#D7263D"/><circle cx="305" cy="190" r="6" fill="#D7263D"/>
+        <circle cx="255" cy="248" r="6" fill="#F39200"/><circle cx="330" cy="172" r="6" fill="#F39200"/>
+        <circle cx="380" cy="252" r="6" fill="#F39200"/><circle cx="420" cy="204" r="6" fill="#F39200"/>
+        <circle cx="335" cy="218" r="6" fill="#F39200"/><circle cx="278" cy="168" r="6" fill="#F39200"/>
+        <circle cx="440" cy="242" r="6" fill="#F39200"/><circle cx="392" cy="172" r="6" fill="#F39200"/>
+        <circle cx="480" cy="228" r="6" fill="#2A9D8F"/><circle cx="508" cy="206" r="6" fill="#2A9D8F"/>
+        <circle cx="202" cy="216" r="6" fill="#2A9D8F"/><circle cx="450" cy="183" r="6" fill="#2A9D8F"/>
+        <line x1="340" y1="200" x2="160" y2="238" stroke="#3FC37A" stroke-width="1.5" opacity=".5"/>
+        <line x1="340" y1="200" x2="255" y2="248" stroke="#3FC37A" stroke-width="1.8" opacity=".5"/>
+        <line x1="340" y1="200" x2="480" y2="228" stroke="#3FC37A" stroke-width="1.8" opacity=".5"/>
+        <line x1="340" y1="200" x2="420" y2="130" stroke="#3FC37A" stroke-width="1.5" opacity=".4"/>
+        <line x1="340" y1="200" x2="200" y2="130" stroke="#3FC37A" stroke-width="1.5" opacity=".35"/>
+        <line x1="340" y1="200" x2="420" y2="280" stroke="#3FC37A" stroke-width="1.3" opacity=".35"/>
+      </svg>
+      <div class="map-ph">
+        <div class="map-icon">🗺️</div>
+        <div class="map-t">Interactive Map · Live HTML Dashboard</div>
+        <div class="map-d">19 stations across Spain colour-coded by grid status.<br/>Corridors weighted by 2027 peak daily sessions.</div>
 
-      <!-- VIDEO PLACEHOLDER -->
-      <div style="flex:1;border-radius:8px;border:1px solid var(--border2);background:#060e09;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;min-height:0;">
-        <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,164,67,.05) 0%,transparent 60%);pointer-events:none;"></div>
-        <!-- pulsing rings to hint at what the video shows -->
-        <div style="position:absolute;width:60px;height:60px;border-radius:50%;border:1px solid rgba(243,146,0,.35);animation:ring-out 3s linear infinite;"></div>
-        <div style="position:absolute;width:60px;height:60px;border-radius:50%;border:1px solid rgba(243,146,0,.25);animation:ring-out 3s linear infinite;animation-delay:1s;"></div>
-        <div style="position:absolute;width:60px;height:60px;border-radius:50%;border:1px solid rgba(0,164,67,.3);animation:ring-out 3s linear infinite;animation-delay:2s;"></div>
-        <div style="text-align:center;z-index:2;position:relative;">
-          <div style="font-size:22px;margin-bottom:6px;opacity:.7;">▶</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--g);letter-spacing:.18em;text-transform:uppercase;">Screen recording</div>
-          <div style="font-size:8px;color:var(--muted);margin-top:3px;">Interactive map · pulsating station rings</div>
+        <!-- COLOR-CODED LEGEND PILLS -->
+        <div style="display:flex;gap:8px;margin-top:14px;justify-content:center;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:20px;background:rgba(215,38,61,.15);border:1px solid rgba(215,38,61,.4);">
+            <div style="width:8px;height:8px;border-radius:50%;background:#D7263D;box-shadow:0 0 6px rgba(215,38,61,.9);flex-shrink:0;"></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#D7263D;font-weight:600;">Congested</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--muted);">3 · 4ch</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:20px;background:rgba(243,146,0,.12);border:1px solid rgba(243,146,0,.4);">
+            <div style="width:8px;height:8px;border-radius:50%;background:#F39200;box-shadow:0 0 6px rgba(243,146,0,.9);flex-shrink:0;"></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#F39200;font-weight:600;">Moderate</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--muted);">12 · 8ch</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:20px;background:rgba(42,157,143,.12);border:1px solid rgba(42,157,143,.4);">
+            <div style="width:8px;height:8px;border-radius:50%;background:#2A9D8F;box-shadow:0 0 6px rgba(42,157,143,.9);flex-shrink:0;"></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#2A9D8F;font-weight:600;">Sufficient</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--muted);">4 · 12–16ch</span>
+          </div>
         </div>
+
+        <!-- CORRIDOR DEMAND LINE -->
+        <div style="display:flex;gap:10px;margin-top:8px;justify-content:center;flex-wrap:wrap;">
+          <div class="lg"><div class="lgl" style="background:var(--glt)"></div>High demand corridor</div>
+          <div class="lg"><div class="lgl" style="background:var(--faint)"></div>Lower demand</div>
+        </div>
+
+        <div class="map-cta">▶ Insert screen recording here</div>
       </div>
-
-      <!-- LEGEND: 3 status pills -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;flex-shrink:0;">
-        <div style="background:rgba(215,38,61,.12);border:1px solid rgba(215,38,61,.4);border-radius:6px;padding:7px 9px;display:flex;align-items:center;gap:7px;">
-          <div style="width:9px;height:9px;border-radius:50%;background:#D7263D;box-shadow:0 0 7px rgba(215,38,61,.8);flex-shrink:0;"></div>
-          <div><div style="font-size:10px;font-weight:700;color:#D7263D;">Congested</div><div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--muted);">4 ch · &lt;1 MW firm</div></div>
-        </div>
-        <div style="background:rgba(243,146,0,.1);border:1px solid rgba(243,146,0,.38);border-radius:6px;padding:7px 9px;display:flex;align-items:center;gap:7px;">
-          <div style="width:9px;height:9px;border-radius:50%;background:#F39200;box-shadow:0 0 7px rgba(243,146,0,.8);flex-shrink:0;"></div>
-          <div><div style="font-size:10px;font-weight:700;color:#F39200;">Moderate</div><div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--muted);">8 ch · 1–5 MW firm</div></div>
-        </div>
-        <div style="background:rgba(42,157,143,.1);border:1px solid rgba(42,157,143,.38);border-radius:6px;padding:7px 9px;display:flex;align-items:center;gap:7px;">
-          <div style="width:9px;height:9px;border-radius:50%;background:#2A9D8F;box-shadow:0 0 7px rgba(42,157,143,.8);flex-shrink:0;"></div>
-          <div><div style="font-size:10px;font-weight:700;color:#2A9D8F;">Sufficient</div><div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--muted);">12–16 ch · &gt;5 MW</div></div>
-        </div>
-      </div>
-
-      <!-- STATION MINI-GRID -->
-      <div style="background:var(--card2);border:1px solid var(--border);border-radius:7px;padding:9px 11px;flex-shrink:0;">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;">19 proposed stations · all corridors</div>
-        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;" id="stationBreakdown"></div>
-      </div>
-
     </div>
     <div class="s2-right">
       <div class="card" style="padding:11px 13px;">
