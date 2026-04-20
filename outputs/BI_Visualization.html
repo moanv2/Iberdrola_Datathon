@@ -217,6 +217,10 @@ html,body{
 .s4-tier-o .s4-ti-val{color:var(--o);}
 .s4-tier-p .s4-ti-val{color:var(--b);}
 .s4-ti-label{font-size:9.5px;color:var(--muted);line-height:1.3;}
+.s4-card-footer{margin-top:auto;padding-top:10px;display:flex;flex-direction:column;gap:6px;}
+.s4-prog-label{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:7.5px;color:var(--muted);margin-bottom:3px;}
+.s4-prog-track{height:5px;background:var(--faint);border-radius:3px;overflow:hidden;}
+.s4-prog-fill{height:100%;border-radius:3px;}
 .s4-roadmap-row{display:flex;flex-direction:column;gap:5px;flex-shrink:0;padding-bottom:4px;}
 .s4-rm-label{font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);}
 .s4-timeline{display:flex;align-items:stretch;gap:0;}
@@ -432,7 +436,16 @@ html,body{
           <div class="s4-ti"><span class="s4-ti-val">85%</span><span class="s4-ti-label">Grid readiness target</span></div>
           <div class="s4-ti"><span class="s4-ti-val">18.6 MW</span><span class="s4-ti-label">i-DE load share by 2027</span></div>
           <div class="s4-ti"><span class="s4-ti-val">€/kWh</span><span class="s4-ti-label">Revenue benchmark</span></div>
-          <div class="s4-ti"><span class="s4-ti-val">PNIEC</span><span class="s4-ti-label">2030 national plan alignment</span></div>
+          </div>
+        <div class="s4-card-footer">
+          <div>
+            <div class="s4-prog-label"><span>Grid readiness progress</span><span style="color:var(--glt)">72%</span></div>
+            <div class="s4-prog-track"><div class="s4-prog-fill" style="width:72%;background:var(--g);"></div></div>
+          </div>
+          <div>
+            <div class="s4-prog-label"><span>Corridor coverage</span><span style="color:var(--glt)">58%</span></div>
+            <div class="s4-prog-track"><div class="s4-prog-fill" style="width:58%;background:var(--g3);"></div></div>
+          </div>
         </div>
       </div>
 
@@ -446,7 +459,16 @@ html,body{
           <div class="s4-ti"><span class="s4-ti-val">14→3</span><span class="s4-ti-label">Friction pts by Q4 2026</span></div>
           <div class="s4-ti"><span class="s4-ti-val">&lt;0.1 MW</span><span class="s4-ti-label">Deficit target per site</span></div>
           <div class="s4-ti"><span class="s4-ti-val">&lt;12 mo</span><span class="s4-ti-label">Commissioning lead time</span></div>
-          <div class="s4-ti"><span class="s4-ti-val">95%</span><span class="s4-ti-label">Uptime target per station</span></div>
+          </div>
+        <div class="s4-card-footer">
+          <div>
+            <div class="s4-prog-label"><span>Friction points resolved</span><span style="color:var(--o)">21%</span></div>
+            <div class="s4-prog-track"><div class="s4-prog-fill" style="width:21%;background:var(--o);"></div></div>
+          </div>
+          <div>
+            <div class="s4-prog-label"><span>Critical zones cleared</span><span style="color:var(--o)">0%</span></div>
+            <div class="s4-prog-track"><div class="s4-prog-fill" style="width:0%;background:var(--o);"></div></div>
+          </div>
         </div>
       </div>
 
@@ -460,7 +482,16 @@ html,body{
           <div class="s4-ti"><span class="s4-ti-val">€12M</span><span class="s4-ti-label">Capex at risk (3 sites)</span></div>
           <div class="s4-ti"><span class="s4-ti-val">40%</span><span class="s4-ti-label">Utilization target month 12</span></div>
           <div class="s4-ti"><span class="s4-ti-val">4</span><span class="s4-ti-label">Tier-4 anchor sites by Q4 2027</span></div>
-          <div class="s4-ti"><span class="s4-ti-val">€9.5M</span><span class="s4-ti-label">Projected year-1 revenue</span></div>
+          </div>
+        <div class="s4-card-footer">
+          <div>
+            <div class="s4-prog-label"><span>Capex deployed</span><span style="color:var(--b)">0%</span></div>
+            <div class="s4-prog-track"><div class="s4-prog-fill" style="width:0%;background:var(--b);"></div></div>
+          </div>
+          <div>
+            <div class="s4-prog-label"><span>Utilization month 12 target</span><span style="color:var(--b)">40%</span></div>
+            <div class="s4-prog-track"><div class="s4-prog-fill" style="width:40%;background:var(--b);"></div></div>
+          </div>
         </div>
       </div>
     </div>
