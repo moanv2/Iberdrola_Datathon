@@ -122,7 +122,7 @@ html,body{
 .s2-body{display:grid;grid-template-columns:1.7fr 1fr;height:100%;}
 .s2-map{position:relative;display:flex;align-items:flex-end;justify-content:center;border-right:1px solid var(--border);overflow:hidden;background:radial-gradient(ellipse at 55% 45%, rgba(0,164,67,.06) 0%, transparent 65%);}
 .map-ph{position:relative;z-index:2;text-align:center;padding:36px 44px;}
-.map-caption{position:absolute;bottom:10px;left:12px;right:12px;z-index:3;background:rgba(6,11,8,.78);border:1px solid var(--border);border-radius:6px;padding:8px 12px;backdrop-filter:blur(6px);}
+.map-caption{position:absolute;bottom:0;left:0;right:0;z-index:3;background:rgba(6,11,8,.92);border-top:1px solid var(--border);border-radius:0 0 0 0;padding:8px 12px;backdrop-filter:blur(6px);height:100px;overflow:hidden;}
 .map-cap-t{font-size:10px;font-weight:600;color:var(--text);margin-bottom:6px;}
 #spainMap .country{fill:rgba(20,35,25,.85);stroke:var(--border2);stroke-width:1.1;}
 #spainMap .corridor{fill:none;stroke-linecap:round;}
@@ -341,15 +341,39 @@ html,body{
   <div class="s2-body">
     <div class="s2-map">
       <div class="grid-bg"></div>
-      <svg id="spainMap" viewBox="0 0 1300 800" style="position:absolute;inset:0;width:100%;height:100%;" preserveAspectRatio="xMidYMid meet"></svg>
+      <svg id="spainMap" viewBox="0 0 1300 800" style="position:absolute;inset:0;width:100%;height:calc(100% - 100px);" preserveAspectRatio="xMidYMid meet"></svg>
       <div class="map-caption">
         <div class="map-cap-t">Spain 2027 corridor and station network</div>
-        <div class="leg-row">
-          <div class="lg"><div class="lgd" style="background:var(--r)"></div>Congested, 4 ch</div>
-          <div class="lg"><div class="lgd" style="background:var(--o)"></div>Moderate, 8 ch</div>
-          <div class="lg"><div class="lgd" style="background:var(--ok)"></div>Sufficient, 12 to 16 ch</div>
-          <div class="lg"><div class="lgl" style="background:var(--glt)"></div>High demand corridor</div>
-          <div class="lg"><div class="lgl" style="background:var(--faint)"></div>Lower demand corridor</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin-top:8px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);grid-column:1/-1;margin-bottom:2px;">MAP LEGEND · GRID STATUS</div>
+          <!-- Congested row -->
+          <div style="display:flex;align-items:center;gap:6px;background:rgba(215,38,61,.08);border:1px solid rgba(215,38,61,.3);border-radius:5px;padding:4px 8px;">
+            <div style="width:9px;height:9px;border-radius:50%;background:var(--r);flex-shrink:0;box-shadow:0 0 5px var(--r);"></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--r);font-weight:600;">Congested</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--muted);margin-left:auto;">3 stations · 4 ch</span>
+          </div>
+          <!-- Moderate row -->
+          <div style="display:flex;align-items:center;gap:6px;background:rgba(243,146,0,.08);border:1px solid rgba(243,146,0,.3);border-radius:5px;padding:4px 8px;">
+            <div style="width:9px;height:9px;border-radius:50%;background:var(--o);flex-shrink:0;box-shadow:0 0 5px var(--o);"></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--o);font-weight:600;">Moderate</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--muted);margin-left:auto;">12 stations · 8 ch</span>
+          </div>
+          <!-- Sufficient row -->
+          <div style="display:flex;align-items:center;gap:6px;background:rgba(42,157,143,.08);border:1px solid rgba(42,157,143,.3);border-radius:5px;padding:4px 8px;">
+            <div style="width:9px;height:9px;border-radius:50%;background:var(--ok);flex-shrink:0;box-shadow:0 0 5px var(--ok);"></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--ok);font-weight:600;">Sufficient</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--muted);margin-left:auto;">4 stations · 12–16 ch</span>
+          </div>
+          <!-- Pulsating ring -->
+          <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:5px;padding:4px 8px;">
+            <div style="width:9px;height:9px;border-radius:50%;border:2px solid rgba(63,195,122,.7);flex-shrink:0;animation:pulse 2.4s infinite;"></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text2);">Pulsating ring = grid friction point</span>
+          </div>
+          <!-- Line width -->
+          <div style="grid-column:1/-1;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:5px;padding:4px 8px;">
+            <div style="width:22px;height:3px;background:linear-gradient(90deg,var(--glt),var(--g3));border-radius:2px;flex-shrink:0;"></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text2);">Line width = corridor demand</span>
+          </div>
         </div>
       </div>
     </div>
@@ -704,7 +728,7 @@ let _cbHtml='<div class="cs-group-hdr">Primary corridors · existing base covers
 const pMax=PRIMARY_CORR[0].peak;
 PRIMARY_CORR.forEach(c=>{
   const pct=(c.peak/pMax*100).toFixed(1);
-  _cbHtml+=`<div class="hbar-row"><div class="hbar-name">${c.name}</div><div class="hbar-track"><div class="hbar-fill" style="background:#2c412f;width:${pct}%"></div></div><div class="hbar-val" style="color:var(--muted)">${(c.peak/1000).toFixed(0)}K demand</div></div>`;
+  _cbHtml+=`<div class="hbar-row"><div class="hbar-name">${c.name}</div><div class="hbar-track"><div class="hbar-fill" style="background:linear-gradient(90deg,var(--g3),var(--g));width:${pct}%"></div></div><div class="hbar-val" style="color:var(--text2)">${(c.peak/1000).toFixed(0)}K</div></div>`;
 });
 _cbHtml+='<div class="cs-group-hdr">Gap-filler routes · our 19 new stations</div>';
 const gMax=13;
