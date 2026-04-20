@@ -621,38 +621,6 @@ CORRIDORS.forEach((c,i)=>{
 // Zones table
 document.getElementById('zonesBody').innerHTML=ZONES.map(z=>`<div class="zt-row"><div class="zt-rk">${String(z.rk).padStart(2,'0')}</div><div class="zt-mun">${z.mun}</div><div class="zt-sub">${z.sub}</div><div style="font-family:'JetBrains Mono',monospace;font-size:8.5px;">${z.cor}</div><div class="zt-def">${z.def.toFixed(2)}</div><div class="zt-pr">${z.pr.toLocaleString()}</div></div>`).join('');
 
-// Station mini-grid
-const STATIONS=[
-  {id:"IBE_001",road:"N-640",ch:4,st:"Congested"},
-  {id:"IBE_002",road:"N-631",ch:8,st:"Moderate"},
-  {id:"IBE_003",road:"N-123",ch:8,st:"Moderate"},
-  {id:"IBE_004",road:"N-121",ch:8,st:"Moderate"},
-  {id:"IBE_005",road:"N-521",ch:8,st:"Moderate"},
-  {id:"IBE_006",road:"N-120",ch:8,st:"Moderate"},
-  {id:"IBE_007",road:"N-625",ch:8,st:"Moderate"},
-  {id:"IBE_008",road:"N-122",ch:12,st:"Sufficient"},
-  {id:"IBE_009",road:"N-120",ch:4,st:"Congested"},
-  {id:"IBE_010",road:"N-621",ch:4,st:"Congested"},
-  {id:"IBE_011",road:"A-63", ch:8,st:"Moderate"},
-  {id:"IBE_012",road:"A-6",  ch:8,st:"Moderate"},
-  {id:"IBE_013",road:"A-6",  ch:8,st:"Moderate"},
-  {id:"IBE_014",road:"A-6",  ch:8,st:"Moderate"},
-  {id:"IBE_015",road:"A-3",  ch:16,st:"Sufficient"},
-  {id:"IBE_016",road:"A-4",  ch:12,st:"Sufficient"},
-  {id:"IBE_017",road:"A-1",  ch:8,st:"Moderate"},
-  {id:"IBE_018",road:"A-2",  ch:8,st:"Moderate"},
-  {id:"IBE_019",road:"AP-7", ch:8,st:"Moderate"},
-];
-const stClr={Congested:"#D7263D",Moderate:"#F39200",Sufficient:"#2A9D8F"};
-const stBg={Congested:"rgba(215,38,61,.13)",Moderate:"rgba(243,146,0,.1)",Sufficient:"rgba(42,157,143,.1)"};
-const stBd={Congested:"rgba(215,38,61,.32)",Moderate:"rgba(243,146,0,.3)",Sufficient:"rgba(42,157,143,.3)"};
-document.getElementById('stationBreakdown').innerHTML=STATIONS.map(s=>`
-  <div style="background:${stBg[s.st]};border:1px solid ${stBd[s.st]};border-radius:5px;padding:5px 6px;">
-    <div style="font-family:'JetBrains Mono',monospace;font-size:7.5px;font-weight:700;color:${stClr[s.st]};">${s.id}</div>
-    <div style="font-family:'JetBrains Mono',monospace;font-size:6.5px;color:var(--muted);">${s.road}</div>
-    <div style="font-size:9px;font-weight:600;color:var(--text);margin-top:2px;">${s.ch} ⚡</div>
-  </div>`).join('');
-
 // Dist bars
 const maxS=14;
 document.getElementById('distBars').innerHTML=DIST.map(d=>`<div class="db-row"><div class="db-name">${d.n}</div><div class="db-bar"><div class="db-fill" style="width:${(d.s/maxS)*100}%;background:${d.color}"></div></div><div class="db-val">${d.s} sites · ${d.mw.toFixed(1)} MW</div></div>`).join('');
