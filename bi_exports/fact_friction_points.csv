@@ -1,0 +1,16 @@
+bottleneck_id,latitude,longitude,route_segment,distributor_network,estimated_demand_kw,grid_status,nearest_node_cap_MW,nearest_node_voltage_kV,nearest_node_dist_km,location_id_fk,is_reinforcement_trigger,capacity_shortfall_mw,province_name
+FRIC_001,42.78247,-7.89001,N-640,i-DE,600,Congested,0.299,66.0,9.49,IBE_001,True,0.301,Lugo
+FRIC_002,41.93092,-6.11659,N-631,i-DE,1200,Moderate,1.408,45.0,9.87,IBE_002,False,0.0,Zamora
+FRIC_003,42.12507,0.40344,N-123,Endesa,1200,Moderate,1.0,25.0,9.58,IBE_003,True,0.2,Huesca
+FRIC_004,43.13948,-1.55327,N-121,i-DE,1200,Moderate,1.85,132.0,8.17,IBE_004,False,0.0,Navarra
+FRIC_005,39.5103,-7.11023,N-521,i-DE,1200,Moderate,4.0,45.0,5.41,IBE_005,False,0.0,Cáceres
+FRIC_006,42.50674,-7.52404,N-120,i-DE,1200,Moderate,2.285,132.0,1.01,IBE_006,False,0.0,Lugo
+FRIC_007,43.1696,-5.07506,N-625,Viesgo,1200,Moderate,3.0,24.0,9.42,IBE_007,False,0.0,Asturias
+FRIC_008,42.31315,-4.7168,N-120,i-DE,600,Congested,0.12,12.0,9.76,IBE_009,True,0.48,Palencia
+FRIC_009,43.09772,-4.68463,N-621,Viesgo,600,Congested,0.06,12.0,9.67,IBE_010,True,0.54,Cantabria
+FRIC_010,43.38258,-6.08972,A-63,Viesgo,1200,Moderate,5.0,22.0,7.27,IBE_011,False,0.0,Asturias
+FRIC_011,39.29113,-5.0976,N-502,i-DE,1200,Moderate,4.0,45.0,9.02,IBE_012,False,0.0,Badajoz
+FRIC_012,39.76613,-3.14194,AP-36,i-DE,1200,Moderate,2.06,15.0,7.7,IBE_013,False,0.0,Toledo
+FRIC_013,42.17957,0.33653,N-123,Endesa,1200,Moderate,1.0,25.0,9.67,IBE_016,True,0.2,Huesca
+FRIC_014,39.46588,-6.97559,N-521,i-DE,1200,Moderate,4.0,45.0,8.8,IBE_017,False,0.0,Cáceres
+FRIC_015,42.55675,-4.36465,A-67,i-DE,1200,Moderate,2.0,30.0,5.19,IBE_019,False,0.0,Palencia

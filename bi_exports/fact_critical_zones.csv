@@ -1,0 +1,36 @@
+zone_id,latitude,longitude,subestacion,municipio,province_name,distributor_network,voltage_kv,capacidad_firme_MW,grid_status,nearest_corridor,dist_to_corridor_km,peak_daily_sessions_2027,deficit_MW,priority_score,reinforcement_type,source_file
+CRITZ_001,39.59138,-3.36736,220007,7040,Illes Balears,Endesa,15.0,0.19,Congested,A-4,12.71,31149.22,1.01,31460.71,New substation or major upgrade,e-distribucion 2026_04_01_R1299_demanda.xlsx
+CRITZ_002,40.47393,-3.70063,3307,Madrid,Madrid,i-DE,20.0,0.2,Congested,A-1,2.28,25999.43,1.0,25999.43,New substation or major upgrade,I-de 2026_04_01_R1-001_Demanda.xlsx
+CRITZ_003,39.49397,-0.40872,3547,València,Valencia,i-DE,20.0,0.26,Congested,A-3,2.73,26992.31,0.94,25372.77,New substation or major upgrade,I-de 2026_04_01_R1-001_Demanda.xlsx
+CRITZ_004,42.62023,-6.46516,3020310006,Bembibre,León,i-DE,45.0,0.0843,Congested,A-6,0.28,22733.28,1.1157,25364.52,New substation or major upgrade,Naturgy 2026_04_01_R1-002_demanda.xlsx
+CRITZ_005,39.49397,-0.40872,3547,València,Valencia,i-DE,20.0,0.46,Congested,A-3,2.73,26992.31,0.74,19974.31,New substation or major upgrade,I-de 2026_04_01_R1-001_Demanda.xlsx
+CRITZ_006,42.75978,-6.63305,3020100002,Fabero,León,i-DE,45.0,0.4052,Congested,A-6,19.37,22733.28,0.7948,18067.6,New substation or major upgrade,Naturgy 2026_04_01_R1-002_demanda.xlsx
+CRITZ_007,42.76171,-6.61523,3020410125,Fabero,León,i-DE,45.0,0.4055,Congested,A-6,19.65,22733.28,0.7945,18062.5,New substation or major upgrade,Naturgy 2026_04_01_R1-002_demanda.xlsx
+CRITZ_008,42.75388,-6.53603,3020300099,Toreno,León,i-DE,45.0,0.4062,Congested,A-6,16.08,22733.28,0.7938,18045.93,New substation or major upgrade,Naturgy 2026_04_01_R1-002_demanda.xlsx
+CRITZ_009,42.61751,-6.60107,3020410444,Cubillos del Sil,León,i-DE,45.0,0.4099,Congested,A-6,3.94,22733.28,0.7901,17962.28,New substation or major upgrade,Naturgy 2026_04_01_R1-002_demanda.xlsx
+CRITZ_010,42.57559,-6.77102,3020310115,Toral de los Vados,León,i-DE,45.0,0.5759,Congested,A-6,0.13,22733.28,0.6241,14187.39,New substation or major upgrade,Naturgy 2026_04_01_R1-002_demanda.xlsx
+CRITZ_011,38.99236,-0.5329,4021,Xàtiva,Valencia,i-DE,20.0,0.23,Congested,A-7,3.11,14451.55,0.97,14018.01,New substation or major upgrade,I-de 2026_04_01_R1-001_Demanda.xlsx
+CRITZ_012,40.30153,-3.45933,ARD,Arganda del Rey,Madrid,i-DE,45.0,0.7013,Congested,A-3,0.49,26992.31,0.4987,13460.5,New substation or major upgrade,Naturgy 2026_04_01_R1-002_demanda.xlsx
+CRITZ_013,40.31832,-3.69117,GTF,Getafe,Madrid,i-DE,45.0,0.7707,Congested,A-4,0.08,31149.22,0.4293,13373.83,New substation or major upgrade,Naturgy 2026_04_01_R1-002_demanda.xlsx
+CRITZ_014,39.06092,-0.27917,3627,Tavernes de la Valldigna,Valencia,i-DE,20.0,0.33,Congested,AP-7,3.32,15326.04,0.87,13333.65,New substation or major upgrade,I-de 2026_04_01_R1-001_Demanda.xlsx
+CRITZ_015,42.45209,-6.1824,2920420176,O Irixo,Ourense,i-DE,132.0,0.6437,Congested,A-6,6.12,22733.28,0.5563,12645.7,New substation or major upgrade,Naturgy 2026_04_01_R1-002_demanda.xlsx
+CRITZ_016,40.38887,-3.61998,VLC,Madrid,Madrid,i-DE,45.0,0.8501,Congested,A-3,0.16,26992.31,0.3499,9444.51,New substation or major upgrade,Naturgy 2026_04_01_R1-002_demanda.xlsx
+CRITZ_017,40.39674,-3.67664,CPL,Madrid,Madrid,i-DE,45.0,1.0112,Moderate,A-4,0.75,31149.22,0.1888,5880.42,Transformer / feeder upgrade,Naturgy 2026_04_01_R1-002_demanda.xlsx
+CRITZ_018,37.7244,-1.3667,3767,Alhama de Murcia,Murcia,i-DE,20.0,0.81,Congested,A-7,9.11,14451.55,0.39,5636.11,New substation or major upgrade,I-de 2026_04_01_R1-001_Demanda.xlsx
+CRITZ_019,39.29128,-0.41791,4024,Almussafes,Valencia,i-DE,20.0,0.89,Congested,AP-7,1.29,15326.04,0.31,4751.07,New substation or major upgrade,I-de 2026_04_01_R1-001_Demanda.xlsx
+CRITZ_020,40.38385,-3.69325,PPA,Madrid,Madrid,i-DE,45.0,1.0477,Moderate,A-4,0.06,31149.22,0.1523,4742.66,Transformer / feeder upgrade,Naturgy 2026_04_01_R1-002_demanda.xlsx
+CRITZ_021,40.34837,-3.90437,VVI,Villaviciosa de Odón,Madrid,i-DE,132.0,0.981,Congested,A-5,2.1,18778.92,0.219,4112.47,New substation or major upgrade,Naturgy 2026_04_01_R1-002_demanda.xlsx
+CRITZ_022,40.43025,-3.69938,NOR,Madrid,Madrid,i-DE,45.0,1.0589,Moderate,A-3,3.64,26992.31,0.1411,3809.79,Transformer / feeder upgrade,Naturgy 2026_04_01_R1-002_demanda.xlsx
+CRITZ_023,38.05615,-0.7365,3639,Rojales,Alicante,i-DE,20.0,1.01,Moderate,AP-7,0.66,15326.04,0.19,2911.95,Transformer / feeder upgrade,I-de 2026_04_01_R1-001_Demanda.xlsx
+CRITZ_024,43.28039,-4.4392,1072,Rionansa,Cantabria,Viesgo,12.0,0.37,Congested,A-8,9.29,2114.14,0.83,1754.73,New substation or major upgrade,Viesgo 2026_04_01_R1005_demanda.xlsx
+CRITZ_025,38.70686,-0.48122,3501,Alcoi/Alcoy,Alicante,i-DE,20.0,0.84,Congested,N-340,1.78,4597.81,0.36,1655.21,New substation or major upgrade,I-de 2026_04_01_R1-001_Demanda.xlsx
+CRITZ_026,41.5774,0.62232,471042037,25007,Lleida,Endesa,25.0,0.95,Congested,AP-2,2.04,5808.0,0.25,1452.0,New substation or major upgrade,e-distribucion 2026_04_01_R1299_demanda.xlsx
+CRITZ_027,43.398,-3.74263,373,Entrambasaguas,Cantabria,Viesgo,12.0,0.53,Congested,A-8,1.03,2114.14,0.67,1416.47,New substation or major upgrade,Viesgo 2026_04_01_R1005_demanda.xlsx
+CRITZ_028,39.58171,-3.36034,23199739,7040,Illes Balears,Endesa,15.0,1.16,Moderate,A-4,13.19,31149.22,0.04,1245.97,Transformer / feeder upgrade,e-distribucion 2026_04_01_R1299_demanda.xlsx
+CRITZ_029,43.39107,-3.71904,33,Entrambasaguas,Cantabria,Viesgo,12.0,0.72,Congested,A-8,0.06,2114.14,0.48,1014.79,New substation or major upgrade,Viesgo 2026_04_01_R1005_demanda.xlsx
+CRITZ_030,43.48215,-5.25559,S000048,Colunga,Asturias,Viesgo,24.0,0.8,Congested,A-8,0.12,2114.14,0.4,845.65,New substation or major upgrade,Eredes 2026_03_20_R1008_demanda.xlsx
+CRITZ_031,43.43291,-4.9424,R000045,Llanes,Asturias,Viesgo,24.0,0.8,Congested,A-8,1.1,2114.14,0.4,845.65,New substation or major upgrade,Eredes 2026_03_20_R1008_demanda.xlsx
+CRITZ_032,43.41492,-4.86586,R000046,Llanes,Asturias,Viesgo,24.0,0.8,Congested,A-8,1.86,2114.14,0.4,845.65,New substation or major upgrade,Eredes 2026_03_20_R1008_demanda.xlsx
+CRITZ_033,43.40157,-4.76819,S000062,Llanes,Asturias,Viesgo,24.0,0.8,Congested,A-8,0.63,2114.14,0.4,845.65,New substation or major upgrade,Eredes 2026_03_20_R1008_demanda.xlsx
+CRITZ_034,43.60873,-5.79222,R000091,Gozón,Asturias,Viesgo,22.0,1.0,Moderate,A-8,8.38,2114.14,0.2,422.83,Transformer / feeder upgrade,Eredes 2026_03_20_R1008_demanda.xlsx
+CRITZ_035,41.51184,2.2182,4631959,8209,Barcelona,Endesa,25.0,1.18,Moderate,AP-7,3.76,15326.04,0.02,306.52,Transformer / feeder upgrade,e-distribucion 2026_04_01_R1299_demanda.xlsx

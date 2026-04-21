@@ -1,0 +1,20 @@
+location_id,latitude,longitude,route_segment,grid_status,distributor_network,n_chargers_proposed,tier_id_fk,pool_demand_kw,pool_demand_mw,estimated_demand_kw,nearest_node_cap_MW,nearest_node_voltage_kV,nearest_node_dist_km,headroom_mw,headroom_ratio,is_friction_point,bottleneck_id_fk,province_name
+IBE_001,42.78247,-7.89001,N-640,Congested,i-DE,4,1,600,0.6,600,0.299,66.0,9.49,-0.301,0.5,True,FRIC_001,Lugo
+IBE_002,41.93092,-6.11659,N-631,Moderate,i-DE,8,2,1200,1.2,1200,1.408,45.0,9.87,0.208,1.17,True,FRIC_002,Zamora
+IBE_003,42.12507,0.40344,N-123,Moderate,Endesa,8,2,1200,1.2,1200,1.0,25.0,9.58,-0.2,0.83,True,FRIC_003,Huesca
+IBE_004,43.13948,-1.55327,N-121,Moderate,i-DE,8,2,1200,1.2,1200,1.85,132.0,8.17,0.65,1.54,True,FRIC_004,Navarra
+IBE_005,39.5103,-7.11023,N-521,Moderate,i-DE,8,2,1200,1.2,1200,4.0,45.0,5.41,2.8,3.33,True,FRIC_005,Cáceres
+IBE_006,42.50674,-7.52404,N-120,Moderate,i-DE,8,2,1200,1.2,1200,2.285,132.0,1.01,1.085,1.9,True,FRIC_006,Lugo
+IBE_007,43.1696,-5.07506,N-625,Moderate,Viesgo,8,2,1200,1.2,1200,3.0,24.0,9.42,1.8,2.5,True,FRIC_007,Asturias
+IBE_008,41.81106,-2.08831,N-122,Sufficient,i-DE,12,3,1800,1.8,1800,,,,,,False,,Soria
+IBE_009,42.31315,-4.7168,N-120,Congested,i-DE,4,1,600,0.6,600,0.12,12.0,9.76,-0.48,0.2,True,FRIC_008,Palencia
+IBE_010,43.09772,-4.68463,N-621,Congested,Viesgo,4,1,600,0.6,600,0.06,12.0,9.67,-0.54,0.1,True,FRIC_009,Cantabria
+IBE_011,43.38258,-6.08972,A-63,Moderate,Viesgo,8,2,1200,1.2,1200,5.0,22.0,7.27,3.8,4.17,True,FRIC_010,Asturias
+IBE_012,39.29113,-5.0976,N-502,Moderate,i-DE,8,2,1200,1.2,1200,4.0,45.0,9.02,2.8,3.33,True,FRIC_011,Badajoz
+IBE_013,39.76613,-3.14194,AP-36,Moderate,i-DE,8,2,1200,1.2,1200,2.06,15.0,7.7,0.86,1.72,True,FRIC_012,Toledo
+IBE_014,39.638,-2.57696,N-420,Sufficient,i-DE,16,4,2400,2.4,2400,,,,,,False,,Illes Balears
+IBE_015,39.01835,-4.45849,N-430,Sufficient,i-DE,12,3,1800,1.8,1800,,,,,,False,,Illes Balears
+IBE_016,42.17957,0.33653,N-123,Moderate,Endesa,8,2,1200,1.2,1200,1.0,25.0,9.67,-0.2,0.83,True,FRIC_013,Huesca
+IBE_017,39.46588,-6.97559,N-521,Moderate,i-DE,8,2,1200,1.2,1200,4.0,45.0,8.8,2.8,3.33,True,FRIC_014,Cáceres
+IBE_018,42.92336,-8.20548,A-54,Sufficient,i-DE,12,3,1800,1.8,1800,,,,,,False,,Pontevedra
+IBE_019,42.55675,-4.36465,A-67,Moderate,i-DE,8,2,1200,1.2,1200,2.0,30.0,5.19,0.8,1.67,True,FRIC_015,Palencia

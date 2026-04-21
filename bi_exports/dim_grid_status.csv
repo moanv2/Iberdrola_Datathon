@@ -1,0 +1,5 @@
+grid_status,cap_min_mw,cap_max_mw,chargers_per_site,pool_mw,color_hex,description
+Congested,0.001,1.0,4,0.6,#D7263D,Firm capacity < 1 MW. Smallest tier. Likely needs reinforcement.
+Moderate,1.0,5.0,8,1.2,#F4A261,Firm capacity 1–5 MW. Default tier.
+Sufficient,5.0,inf,12,1.8,#2A9D8F,Firm capacity > 5 MW. Build out. Split at 10 MW: >10 MW → 16 chargers.
+Unknown,,,0,0.0,#9E9E9E,Grid status not determined (e.g. station unable to match a grid node). Flag in BI.

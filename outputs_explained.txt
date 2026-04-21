@@ -1,0 +1,457 @@
+================================================================
+OBJECTIVE 1 — CHARGING NETWORK OUTPUTS EXPLAINED  (v3 — image-tier sizing)
+Audience:  domain expert on our team
+Author:    Diego (T1 / Forecast Lead)
+Scope:     File_1.csv, File_2.csv, File_3.csv
+Context:   IE-Iberdrola Datathon Marzo 2026
+Version:   v3 — replaced v4-notebook's voltage-cap sizing (2/4/8
+           chargers by kV table) with pure grid_status tier from
+           the team-supplied image (4/8/12 or 16 chargers). The
+           voltage cap lacked a verifiable citation in the i-DE
+           docs and was too conservative. All other v2 machinery
+           (empirical CNMC R1-001 grid, strict zero-MW gate,
+           distributor remap, set-cover placement) is unchanged.
+================================================================
+
+CONTENTS
+  1. The pipeline at a glance
+  2. File_1 — Global KPI scorecard (1 row)
+  3. File_2 — Proposed charging stations
+  4. File_3 — Friction points
+  5. How we chose the categorical / derived values
+       5.1  grid_status          (Sufficient / Moderate / Congested)   ** REWRITTEN **
+       5.2  distributor_network  (i-DE / Endesa / Viesgo)
+       5.3  n_chargers_proposed  (image-driven grid_status tier)        ** REWRITTEN v3 **
+       5.4  location selection   (why each site is where it is)
+       5.5  feasibility gate     (strict zero-MW rule)                  ** NEW **
+  6. Datathon rules we had to respect
+  7. Parameter table — what we set and why
+  8. Grid-node database (the new empirical backbone)                    ** NEW **
+  9. Known limitations (things to flag in the analytical report)
+
+
+================================================================
+1. THE PIPELINE AT A GLANCE
+================================================================
+
+We run four notebooks in order. Each one produces a file the next
+one consumes. Notebook 04 now additionally consumes a unified
+grid-node database assembled by build_grid_nodes.py from the 7
+CNMC R1-001 distributor filings.
+
+  NB 01 — Load roads
+      Reads the CNIG national road shapefile, keeps only state-
+      owned interurban roads (AP / A / N), and dissolves their
+      segments into one feature per road.
+      Output: 191 roads, ~48,000 km total.
+
+  NB 02 — Existing chargers
+      Parses the public DATEX2 charger feed and spatially filters
+      to chargers sitting within 5 km of the roads from NB 01.
+      Output: 7,890 existing stations.
+
+  NB 03 — Demand allocation
+      Takes the 2027 EV fleet forecast (614,412 vehicles) from the
+      forecasting team's SARIMA model, splits it across provinces
+      using DGT registration data, then maps it to 19 major road
+      corridors with expected 2027 peak-daily charging sessions.
+
+  build_grid_nodes.py (pre-processing, run once)
+      Reads the 7 CNMC R1-001 distributor Excel files from
+      data/raw/grid_capacity/ and writes a unified 5,927-row
+      grid_nodes.csv to data/processed/.
+
+  NB 04 — Station placement
+      Produces File_1, File_2, File_3. Combines real road geometry
+      from NB 01, existing chargers from NB 02, demand tiers from
+      NB 03, and the 5,927 CNMC substation nodes from the grid
+      database. Runs a greedy SET COVER optimization with an
+      empirical grid-capacity feasibility gate.
+
+
+================================================================
+2. FILE_1 — GLOBAL KPI SCORECARD (1 row)
+================================================================
+
+Purpose: a single summary row the jury can scan at a glance.
+
+Columns (order fixed by the datathon):
+
+  total_proposed_stations
+      Source:  len(File_2). Matches the greedy Set Cover output.
+
+  total_existing_stations_baseline   = 7,890
+      Source:  row count from NB 02 after the 5 km interurban
+               buffer. The baseline we try NOT to duplicate.
+
+  total_friction_points
+      Source:  len(File_3). Subset of proposed stations that sit
+               on Moderate or Congested grid — feeds Objective 2.
+
+  total_ev_projected_2027            = 614,412
+      Source:  SARIMA Model_1 from the forecasting team.
+
+
+================================================================
+3. FILE_2 — PROPOSED CHARGING STATIONS
+================================================================
+
+Purpose: the deliverable map of NEW stations we recommend
+Iberdrola build before 2027.
+
+Columns (exactly as mandated):
+
+  location_id          IBE_001 ... (zero-padded, sequential)
+  latitude, longitude  WGS84, 5 decimal places (~1 m precision)
+  route_segment        road designation the station sits on
+                       (e.g. N-640, AP-1, N-601)
+  n_chargers_proposed  4, 8, 12, or 16 chargers per site
+                       (see §5.3 — grid_status-tier sizing, v3)
+  grid_status          Sufficient / Moderate / Congested
+                       (see §5.1 — now empirical capacity bands)
+
+Row order: the greedy algorithm picks the highest-gain site first.
+IBE_001 closed the largest coverage gap; the last IBE entry closed
+the smallest.
+
+
+================================================================
+4. FILE_3 — FRICTION POINTS
+================================================================
+
+Purpose: flag the subset of proposed stations the grid will likely
+struggle to absorb. Feeds Objective 2 (grid viability).
+
+Jury submission file (File_3.csv) — strict 7-column schema:
+
+  bottleneck_id         FRIC_001 ... (sequential)
+  latitude, longitude   inherited from File_2
+  route_segment         inherited from File_2
+  distributor_network   i-DE / Endesa / Viesgo  (Rule 1 enum)
+  estimated_demand_kw   n_chargers_proposed × 150  (Rule 2)
+  grid_status           Moderate OR Congested ONLY (Rule 3)
+
+Internal audit file (File_3_audit.csv) — NOT submitted to jury:
+Adds three evidence columns for the grid-viability team so every
+friction flag can be traced back to a specific substation filing:
+
+  nearest_node_cap_MW        (capacidad firme disponible, empirical)
+  nearest_node_voltage_kV    (nivel de tension, empirical)
+  nearest_node_dist_km       (distance from station to node)
+
+
+================================================================
+5. HOW WE CHOSE THE CATEGORICAL / DERIVED VALUES
+================================================================
+
+--------------------------------------------------------
+5.1  grid_status   (REWRITTEN for v2 — empirical capacity bands)
+--------------------------------------------------------
+
+The datathon fixes the three allowed labels but lets us choose the
+classification rule, as long as the thresholds are documented
+(Rule 1).
+
+v2 replaces the old distance-to-city proxy with empirical capacity
+bands applied to the CNMC R1-001 'capacidad firme disponible (MW)'
+at each station's NEAREST grid node:
+
+    Sufficient  if  capacidad_firme_MW > 5
+    Moderate    if  1 <= capacidad_firme_MW <= 5
+    Congested   if  capacidad_firme_MW < 1
+
+Source for thresholds: the datathon parameter image from the IE-
+Iberdrola brief. Same bands are used by i-DE's public 'Mapa de
+Capacidad de Consumo' (2025).
+
+No assumptions about rural vs urban. If a rural station sits near
+a 132 kV feeder with 15 MW free it is correctly labelled Sufficient;
+if a peri-urban station sits near a saturated 20 kV node with
+0.7 MW free it is correctly labelled Congested. The user's explicit
+guidance: *don't just assume that because it's rural it's congested*.
+
+--------------------------------------------------------
+5.2  distributor_network   (i-DE / Endesa / Viesgo)
+--------------------------------------------------------
+
+Only these three labels are accepted (Rule 1).
+
+We keep the geographic zone rule from v1, with a small remap
+addition: substation filings from DSOs outside the 3-enum set
+(Begasa/Eredes/Naturgy) still inform capacity and voltage but the
+distributor LABEL is resolved to one of the 3 legal enums by
+geography:
+
+    Viesgo:   lat > 43.0  AND  -6.5 < lon < -3.0
+              (Cantabria + Asturias)
+
+    Endesa:   Catalunya        lon > 0.5   AND lat > 40.5
+              Aragón           -1.5 < lon <= 0.5 AND lat > 40.5
+              Andalucía east   lat < 38   AND lon > -2.5
+
+    i-DE:     everything else (default — Iberdrola's historical
+              centre-west peninsula service area).
+
+Concession polygon data is not open-licensed, so zone-based
+assignment is the standard public-data proxy.
+
+--------------------------------------------------------
+5.3  n_chargers_proposed   (REWRITTEN v3 — pure grid_status tier)
+--------------------------------------------------------
+
+In v3, n_chargers is determined SOLELY by grid_status. The v4
+voltage cap and physical-headroom cap have been removed because
+no team member could verify the 2/4/8 voltage cap in any of the
+documents supplied by the datathon, and the resulting sizing was
+too conservative for an Iberdrola 2027 deployment.
+
+The new tier comes directly from the team-supplied image
+("Low/Medium/High" capacity bins → charger counts):
+
+  grid_status  | capacidad_firme_MW | n_chargers | demand_kw
+  ------------ | ------------------ | ---------- | ---------
+  Congested    | < 1 MW             |    4       |    600
+  Moderate     | 1 - 5 MW           |    8       |  1,200
+  Sufficient   | 5 - 10 MW          |   12       |  1,800
+  Sufficient   | > 10 MW            |   16       |  2,400
+
+The image showed "12 o 16" for the High band; we split at
+10 MW so the full design range is used. Both 12-charger and
+16-charger sites appear in File_2 — the 16-charger ones cluster
+on the genuinely high-capacity Sufficient nodes (typically
+40+ kV, 15-40 MW available).
+
+Because KW_PER_CHARGER = 150 is fixed by Rule 2, site power is
+deterministic and Rule-2-compliant by construction:
+    4  x 150  =    600 kW
+    8  x 150  =  1,200 kW
+    12 x 150  =  1,800 kW
+    16 x 150  =  2,400 kW
+
+Corridor-demand tercile (High/Medium/Low) is still computed
+in the notebook's `tier_map` for analytics and the strategic
+narrative, but it does NOT cap n_chargers anymore.
+
+Congested sites (0 < cap < 1 MW) are still proposed at 4
+chargers and flagged in File_3. The Obj 2 critical_zones.csv
+analysis identifies these as priority reinforcement targets
+(see /obj2_explained.txt §4). The implicit assumption — that
+Iberdrola's charger capex is paired with grid capex on the
+2027 horizon — must be stated in the Analytical Report.
+
+--------------------------------------------------------
+5.4  location selection
+--------------------------------------------------------
+
+Set Cover formulation:
+    Universe U  = every 1 km point along the interurban road
+                  network (~256k points).
+    Candidates  = potential sites every 5 km along those roads
+                  (~237k candidates).
+
+Pre-cover: every universe point within COVERAGE_RADIUS_KM of an
+existing fast-charging hub (n_connectors >= 4) is marked already
+covered before optimization.
+
+New in v2 — feasibility gate: every candidate is attached to its
+nearest substation node (within 10 km). Candidates where the best
+node has capacity <= 0 MW are DROPPED. This enforces the user's
+rule: "if == 0 MW, no available power, no station".
+
+Greedy algorithm: repeatedly pick the single candidate that covers
+the most still-uncovered universe points. Proven ln(|U|)+1
+approximation (Feige 1998).
+
+--------------------------------------------------------
+5.5  Feasibility gate (NEW)
+--------------------------------------------------------
+
+After candidate generation and before optimization:
+
+  For every candidate, find all grid nodes within NODE_SEARCH_RADIUS_KM
+  (10 km). Take the node with maximum available MW (ties broken by
+  highest voltage).
+
+  DROP if either:
+    (a) no grid node within 10 km (deep infrastructure vacuum), OR
+    (b) the best node has capacity < MIN_CAP_MW_BUILD (0.001 MW,
+        i.e. effectively zero — enforces user's strict zero rule).
+
+Rows in the audit file (File_3_audit.csv) show:
+    nearest_node_cap_MW        (the evidence for grid_status and for
+                                the Congested/Moderate/Sufficient tier
+                                that drives sizing — see §5.3 v3)
+    nearest_node_voltage_kV    (contextual only in v3; retained for
+                                the grid-viability team's reinforcement
+                                studies but no longer a sizing cap)
+    nearest_node_dist_km       (how far the nearest feasible node is)
+
+These are kept OUT of the jury File_3.csv to respect the strict
+Section 5 schema, but the grid-viability team uses them for
+Obj 2 reinforcement studies.
+
+
+================================================================
+6. DATATHON RULES WE HAD TO RESPECT
+================================================================
+
+  Rule 1   grid_status must be one of
+           {Sufficient, Moderate, Congested}.
+           distributor_network must be one of
+           {i-DE, Endesa, Viesgo}.
+           Any other label -> disqualification.
+
+  Rule 2   estimated_demand_kw = n_chargers_proposed x 150.
+           150 kW per charger is fixed. Do not change.
+
+  Rule 3   File 3 contains ONLY Moderate or Congested rows.
+           Sufficient stations are excluded.
+
+Additional self-imposed constraints:
+  - Stations must sit on interurban roads (AP / A / N). Urban
+    streets excluded.
+  - All forecasts target end of 2027.
+  - NEW: stations must have a feasible grid node (cap > 0) within
+    10 km. Else the candidate is dropped.
+
+
+================================================================
+7. PARAMETER TABLE — WHAT WE SET AND WHY
+================================================================
+
+  MAX_SPACING_KM  =  50
+      20% below the EU AFIR-2023 regulatory floor (60 km on
+      TEN-T core network for >=150 kW pools).
+
+  COVERAGE_RADIUS_KM  =  25
+      Half of MAX_SPACING_KM. A road point is covered if some
+      station sits within this radius.
+
+  CANDIDATE_SPACING_KM  =  5
+      Generation granularity along each road.
+
+  MIN_DIST_EXISTING_KM  =  15
+      Candidates within 15 km of an existing fast hub are
+      dropped before optimization (prevents redundant spend).
+
+  FAST_HUB_MIN_CONNECTORS  =  4
+      Proxy for a DC fast-charging hub. ~2,400 existing sites
+      qualify across Spain — matches Iberdrola/Repsol public
+      counts.
+
+  NODE_SEARCH_RADIUS_KM  =  10    (NEW in v2)
+      Max distance from candidate to nearest usable grid node.
+      Beyond 10 km, connection cost/ permitting are economically
+      unrealistic for an MV/HV station.
+
+  MIN_CAP_MW_BUILD  =  0.001      (NEW in v2)
+      Strict-zero gate. Only candidates where the best node
+      within 10 km reports exactly 0 MW are dropped
+      (user's rule: "== 0 MW means no station"). Congested
+      sites with any positive capacity (even 0.05 MW) are still
+      proposed and flagged for Obj 2 reinforcement.
+
+  MW_SUFFICIENT  =  5.0   (NEW in v2)   // > 5 MW -> Sufficient
+  MW_MODERATE_MIN  =  1.0 (NEW in v2)   // 1-5 MW -> Moderate
+                                        // < 1 MW -> Congested
+
+  KW_PER_CHARGER  =  150
+      Fixed by Rule 2. Not a design choice.
+
+  EV_RANGE_KM  =  300
+      Fleet-weighted 2024-2026 WLTP average ~400 km, times 0.75
+      real-world derating. Sanity-check only.
+
+  TRIPS_PER_MONTH  =  3        (NB 03 only)
+      DGT baseline * 1.2x gas-price premium. See NB 03 for the
+      full empirical chain.
+
+
+================================================================
+8. GRID-NODE DATABASE (NEW)
+================================================================
+
+Source files (all in data/raw/grid_capacity/):
+  i-DE       R1-001  3,017 nodes
+  Endesa 1   R1-026      5 nodes
+  Endesa 2   R1-299  1,839 nodes
+  Viesgo     R1-005    177 nodes
+  Begasa     R1-003     23 nodes
+  Eredes     R1-008    187 nodes
+  Naturgy    R1-002    679 nodes
+  ----------------------------------
+  Total (after NaN filtering):   5,927 nodes
+
+Key columns we use:
+  lat / lon                  (reprojected from UTM)
+  capacidad_firme_MW         (float — feasibility gate AND, in v3,
+                              the sole driver of n_chargers via the
+                              image-based grid_status tier in §5.3)
+  voltage_kv                 (int — contextual/audit only in v3; no
+                              longer caps charger count)
+  distributor                (7 DSOs, remapped to 3 legal enums)
+  subestacion / municipio    (audit trail)
+
+Capacity distribution across all 5,927 nodes:
+  Congested  (<1 MW):   5,426  (92%)
+  Moderate   (1-5 MW):    252  (4%)
+  Sufficient (>5 MW):     249  (4%)
+
+Implication: most of Spain's current transmission infrastructure
+has very limited firm capacity for new demand. This is why the
+empirical placement gives a smaller station count than an
+assumption-based approach would — the gate is honest about where
+the grid CAN host new load today.
+
+Coordinate handling: i-DE uses European decimal comma
+(e.g. "499100,028..."); build_grid_nodes.py coerces this with a
+locale-safe to_num_eu() helper. All 7 filings reprojected to WGS84
+via pyproj (UTM 30N for mainland, 29N for Galicia).
+
+Rebuilding: run
+    python 02_charging_network/build_grid_nodes.py
+from the Iberdrola_Datathon root. Takes about 10 seconds.
+
+
+================================================================
+9. KNOWN LIMITATIONS
+================================================================
+
+(a) Total station count is bounded by the empirical feasibility
+    gate. Where the strict zero-gate drops candidates, the greedy
+    Set Cover cannot cover those road points — they surface as
+    "disconnected outliers" in the optimization log. This is a
+    feature, not a bug: the algorithm is honest about what can
+    physically be built without reinforcement.
+
+    The Analytical Report should flag the % of gap universe that
+    could not be closed at today's grid capacity as evidence for
+    Obj 2's reinforcement case.
+
+(b) distributor_network is assigned by lat/lon rectangles, not
+    real concession polygons. Boundary cases on zone edges may
+    flip. Fine at corridor scale, imperfect at individual-
+    customer scale.
+
+(c) FAST_HUB_MIN_CONNECTORS = 4 remains a public-data proxy.
+    Some real DC fast hubs have 2 connectors; some 4-connector
+    sites are slow AC. Error cancels on average but is imperfect.
+
+(d) Site sizing uses the 19-corridor tercile split. Roads outside
+    that set default to Medium (4 chargers). Conservative — not a
+    claim of demand parity with the main A-roads.
+
+(e) The grid-node database is a snapshot of early-2026 CNMC
+    filings. Real grid capacity changes monthly as interconnection
+    requests close out. A production deployment would re-run
+    build_grid_nodes.py on each refresh.
+
+(f) Three DSOs (Begasa/Eredes/Naturgy) contribute grid intelligence
+    but have no direct mapping to the 3 legal datathon enums. We
+    remap by geography — defensible at corridor scale, but a
+    real-world plan would use the DSO's own concession polygon.
+
+
+================================================================
+END
+================================================================

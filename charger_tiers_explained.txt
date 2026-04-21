@@ -1,0 +1,153 @@
+================================================================
+CHARGER-TIER SIZING RULE — v5  (IE-Iberdrola Datathon 2026)
+Teammate briefing
+Author: Diego (T1 / Forecast Lead)          Last updated: 2026-04-18
+================================================================
+
+1. TL;DR
+--------
+We removed the voltage-cap sizing rule (2 / 4 / 8 chargers per site
+capped by voltage level, taken from an i-DE internal table you
+couldn't find a verifiable citation for) and replaced it with a
+clean, source-documented grid_status tier that comes directly from
+the Iberdrola datathon brief slide you pointed out:
+
+    Low capacity  (Congested)   →   4 chargers
+    Medium       (Moderate)     →   8 chargers
+    High         (Sufficient)   →  12 or 16 chargers
+
+This is strictly more generous than the old rule, so every
+File_2 station has grown in size but none have moved location.
+File_3 (friction points, 14 rows) uses the same (lat, lon) set as
+before; only demand_kw values have increased.
+
+
+2. THE EXACT RULE IN THE NEW NOTEBOOK
+-------------------------------------
+Inside 02_charging_network/04_station_placement.ipynb (v5):
+
+    def classify_grid_status(cap_mw):
+        if cap_mw > 5.0:   return 'Sufficient'
+        if cap_mw >= 1.0:  return 'Moderate'
+        return 'Congested'
+
+    def n_chargers_by_status(cap_mw):
+        status = classify_grid_status(cap_mw)
+        if status == 'Sufficient':
+            return 16 if cap_mw > 10.0 else 12
+        if status == 'Moderate':
+            return 8
+        return 4                     # Congested (0 < cap < 1 MW)
+
+Rule 2 (datathon) is preserved by construction:
+    estimated_demand_kw = n_chargers × 150 kW
+
+so the four possible demand_kw values are:
+    4  × 150 =    600
+    8  × 150 =  1 200
+    12 × 150 =  1 800
+    16 × 150 =  2 400
+
+
+3. WHY THE SPLIT INSIDE "SUFFICIENT"
+------------------------------------
+The brief slide says "High → 12 or 16 chargers" without telling us
+when to pick each. We resolved the ambiguity transparently:
+
+    Sufficient & cap ≤ 10 MW   → 12 chargers   (pool = 1.8 MW)
+    Sufficient & cap >  10 MW  → 16 chargers   (pool = 2.4 MW)
+
+The 10 MW line is chosen because a fully built-out 16-charger pool
+draws 2.4 MW; requiring ≥ 10 MW of firm capacity leaves ~4× the
+pool demand as operational headroom for ramp, ancillary loads and
+the distributor's own utilisation target. This is documented in
+the Analytical Report (Assumptions §A3').
+
+
+4. WHY WE DROPPED THE VOLTAGE CAP
+---------------------------------
+The old v4 sizing rule was:
+
+    voltage_kv        →  max_chargers
+    -------------------------------
+    15 kV or 20 kV    →   2
+    45 kV             →   4
+    66 kV or higher   →   8
+
+The value of that table could not be reproduced from any Iberdrola
+document we have access to. It also pushed us to under-build on
+nodes that the empirical capacidad_firme_MW clearly supports. The
+datathon slide is an actual published source — so we switched to it
+and dropped the undocumented cap entirely.
+
+voltage_kv is still recorded in File_3_audit.csv for the grid
+viability team, but it no longer affects station sizing.
+
+
+5. IMPACT ON OBJECTIVE 1 DELIVERABLES
+-------------------------------------
+All three jury files re-generated cleanly with v5:
+
+  File_1.csv  (baseline forecast) — UNCHANGED
+       18 stations | 7,890 baseline chargers | 614,412 EVs
+
+  File_2.csv  (proposed stations) — same 18 sites, new sizes
+       Congested   ×  4 chargers ........  3 stations
+       Moderate    ×  8 chargers ........ 11 stations
+       Sufficient  × 12 chargers ........  3 stations
+       Sufficient  × 16 chargers ........  1 station (IBE_013, N-420)
+
+  File_3.csv  (friction points) — same 14 (lat, lon) rows
+       Congested → demand_kw = 600   (was 300 in v4)
+       Moderate  → demand_kw = 1 200 (was  600 in v4)
+
+Station locations did not move because the set-cover algorithm
+optimises COVERAGE, not SIZE — and the feasibility gate
+(cap > 0.001 MW) is unchanged.
+
+
+6. IMPACT ON OBJECTIVE 2 (critical_zones.csv)
+---------------------------------------------
+Zero change. critical_zones.csv is recomputed against grid_nodes.csv
+directly, with its own TARGET_MW = 1.2 (an 8-charger pool) threshold
+that is hard-coded in 03_grid_viability/01_critical_zones.ipynb.
+That pipeline never consumed the per-station n_chargers column.
+
+
+7. WHAT TO SAY ABOUT THIS IN THE REPORT
+---------------------------------------
+When you write up the sizing methodology, cite:
+  * The datathon slide (Low/Medium/High → 4/8/12 or 16) as the
+    published source
+  * The 10 MW threshold for the 12 vs 16 split as OUR stated
+    convention, with the 4× headroom argument
+  * Rule 2 (demand_kw = n_chargers × 150) as the reason all demand
+    values are clean multiples of 150
+
+
+8. FILES TOUCHED BY THIS CHANGE
+-------------------------------
+  /02_charging_network/04_station_placement.ipynb      (regenerated v5)
+  /outputs/File_2.csv                                  (re-written)
+  /outputs/File_3.csv                                  (re-written)
+  /outputs/File_3_audit.csv                            (re-written)
+  /outputs_explained.txt                               (bumped to v3)
+  /charger_tiers_explained.txt                         (this file — NEW)
+
+Unchanged:
+  /outputs/File_1.csv
+  /outputs/critical_zones.csv
+  /obj2_explained.txt
+  /data/processed/grid_nodes.csv
+  All upstream build scripts and the set-cover algorithm itself
+
+
+9. HOW TO REGENERATE
+--------------------
+    cd /Iberdrola_Datathon/02_charging_network/
+    jupyter nbconvert --to notebook --execute 04_station_placement.ipynb
+
+The notebook prints the new tier table at the top of §9 so the
+sizing rule is auditable on every run.
+
+--- END ---

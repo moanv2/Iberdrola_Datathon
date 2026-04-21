@@ -1,0 +1,5 @@
+tier_id,n_chargers,tier_label,pool_mw,demand_kw,applies_to_grid_status,approx_stations_built
+1,4,S (Congested),0.6,600,Congested,3
+2,8,M (Moderate),1.2,1200,Moderate,11
+3,12,L (Sufficient 5-10),1.8,1800,Sufficient,3
+4,16,XL (Sufficient >10),2.4,2400,Sufficient,1

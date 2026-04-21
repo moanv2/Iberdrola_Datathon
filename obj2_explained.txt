@@ -1,0 +1,227 @@
+================================================================
+OBJECTIVE 2 — GRID VIABILITY ANALYSIS  (IE-Iberdrola Datathon 2026)
+Teammate briefing — supplementary to outputs_explained.txt
+Author: Diego (T1 / Forecast Lead)        Last updated: 2026-04-17
+================================================================
+
+1. WHY THIS FILE EXISTS
+-----------------------
+Objective 2 of the datathon asks for "a geospatial analysis identifying
+the specific nodes or regions where grid capacity restricts deployment"
+(brief p.4). The JURY-MANDATED deliverable for that objective is File 3
+(FRIC_001…FRIC_014), and that file is already in /outputs and is frozen.
+
+File 3 is a 14-row STATION-LEVEL bottleneck log — it tells the jury
+where proposed chargers would hit grid-capacity friction. What it does
+NOT do is show the wider NETWORK-LEVEL picture: which substations across
+Spain should Iberdrola reinforce first, regardless of whether we happen
+to have placed a charger there? That wider answer is what this Obj 2
+work delivers on top of File 3, via a supplementary layer:
+
+    /outputs/critical_zones.csv            (41 rows, 17 cols)
+    /03_grid_viability/figures/critical_zones_map.png
+
+Both artefacts are documented as "innovation beyond the baseline" in the
+Analytical Report — the datathon explicitly rewards this kind of
+additional analysis (p.12 "additional layers… positively valued";
+p.15 T3 "crossing of mobility data with distributor capacity datasets").
+
+
+2. HOW THE TWO OBJ-2 ARTEFACTS RELATE
+-------------------------------------
+File_3.csv                    critical_zones.csv
+--------------------------    ---------------------------
+14 rows                       41 rows
+7 mandatory columns           17 analytical columns
+Locations = proposed          Locations = every interurban
+  charging stations where       substation within 25 km of
+  grid_status ∈ {Moderate,      an A-/AP-/N- corridor where
+  Congested}                    grid_status ∈ {Moderate, Congested}
+JURY SUBMISSION               Internal evidence / BI layer
+Do not modify                 May be refined further
+
+A File_3 friction point maps to a File_2 proposed station (same coords,
+same grid_status). A critical_zones row maps to a PHYSICAL grid
+substation (CNMC R1-001 data) and therefore includes the substation
+name, municipio, voltage level, exact MW available, nearest corridor,
+demand weight, and a priority score. They are complementary, not
+redundant.
+
+
+3. SOURCE OF TRUTH — INPUT DATA
+-------------------------------
+All inputs are built or loaded in notebook 05 (01_critical_zones.ipynb):
+
+ * grid_nodes.csv  (5,927 rows, from CNMC R1-001 April-2026 filings of
+   i-DE, Endesa/e-Distribución, Viesgo, Naturgy, Eredes, Begasa —
+   unified + UTM→lat/lon by data/processed/… pipeline; see Obj 1
+   outputs_explained.txt §8 for the build script).
+
+ * roads_interurban_dissolved.geojson  (191 dissolved line features,
+   from Ministry of Transport Road Routes dataset filtered to
+   autopistas + autovías + carreteras nacionales; see Obj 1 §4.3).
+
+ * demand_by_corridor.csv  (19 interurban corridors with
+   peak_daily_sessions projected to 2027 from the datos.gob.es
+   electromobility GitHub fork + DGT monthly registrations).
+
+ * File_2.csv / File_3.csv  — Obj 1 outputs, unchanged.
+
+
+4. METHODOLOGY — STEP BY STEP
+-----------------------------
+ Step A.  Feasibility gate
+           grid_nodes.csv → drop rows with capacidad_firme_MW < 0.001
+           (same MIN_CAP_MW_BUILD as Obj 1). 5,927 → 626 candidate
+           nodes. The ~5,300 excluded nodes are EXACTLY-zero-capacity
+           substations; they are physical no-builds until new
+           transformers are commissioned and fall outside Obj 2's
+           "reinforcement candidate" definition.
+
+ Step B.  Grid-status classification (identical bands to Obj 1)
+           capacidad_firme_MW  >  5.0  →  Sufficient
+           1.0 ≤ capacidad      ≤  5.0 →  Moderate
+           0   < capacidad      <  1.0 →  Congested
+
+ Step C.  Distributor remap (Rule 1 compliance)
+           i-DE                            → i-DE
+           Naturgy (Madrid/Galicia/CLM)    → i-DE
+           Begasa  (Lugo)                  → i-DE
+           Endesa                          → Endesa
+           Viesgo  (Cantabria/N-Asturias)  → Viesgo
+           Eredes  (Asturias)              → Viesgo
+           Remap is geographic — the collapsed labels match the true
+           licensed service areas of the 3 accepted DSOs.
+
+ Step D.  Spatial join (nodes ⟷ corridors)
+           Sample each interurban line every 2 km → 487,465 points.
+           For each of the 626 nodes, find nearest sample via cKDTree
+           → dist_to_corridor_km, nearest_corridor.
+           Drop nodes > 25 km from any corridor (scope rule, brief p.2:
+           "interurban transport network"). 626 → 549.
+
+ Step E.  Attach corridor demand
+           Merge nearest_corridor → peak_daily_sessions (2027).
+           Roman-numeral harmonization (N-II ↔ N-2, etc.) so that
+           corridors named differently in MITMA vs. demand table still
+           match. 549 → 188 nodes with non-zero demand weight (others
+           are on tributary N-roads not in the 19-corridor table).
+
+ Step F.  Deficit and priority
+           TARGET_MW = 1.2  (8-charger fast pool = 8 × 150 kW)
+           deficit_MW     = max(0, TARGET_MW − capacidad_firme_MW)
+           priority_score = deficit_MW × peak_daily_sessions_2027
+
+ Step G.  Filter to critical zones
+           Keep rows where:
+              grid_status ∈ {Moderate, Congested}  AND
+              priority_score > 0
+           Sort descending by priority_score. Final universe = 41 rows.
+
+
+5. OUTPUT SCHEMA — critical_zones.csv
+-------------------------------------
+ Column                         Type    Source / meaning
+ ------------------------------ ------- ----------------------------------
+ zone_id                        str     CRITZ_001 … CRITZ_041
+ latitude, longitude            float   WGS-84, from UTM in R1-001
+ subestacion                    str     Substation name (raw DSO field)
+ municipio                      str     Raw R1-001 municipio field
+ provincia                      str     Raw R1-001 provincia field
+ distributor_network            str     {i-DE, Endesa, Viesgo} — Rule 1
+ voltage_kv                     float   Nivel de tensión (R1-001)
+ capacidad_firme_MW             float   Capacidad firme disponible (R1-001)
+ grid_status                    cat     Sufficient/Moderate/Congested (Obj 1 bands)
+ nearest_corridor               str     e.g. A-2, A-4, N-122…
+ dist_to_corridor_km            float   kd-tree distance, ≤ 25
+ peak_daily_sessions_2027       float   From demand_by_corridor.csv
+ deficit_MW                     float   max(0, 1.2 − capacidad_firme_MW)
+ priority_score                 float   deficit_MW × peak_daily_sessions
+ reinforcement_type             str     "New substation or major upgrade"
+                                         if Congested; else
+                                         "Transformer / feeder upgrade"
+ source_file                    str     Original distributor xlsx filename
+
+
+6. HEADLINE FINDINGS
+--------------------
+ * Total critical zones identified ............ 41
+      – Congested (< 1 MW) .................... 32
+      – Moderate  (1–5 MW) ....................  9
+ * Priority concentration:
+      – León           (7 zones, Σ score 136,822) — A-6 / N-630 belt
+      – Valencia       (5 zones, Σ score  77,449) — A-3 / N-III
+      – Madrid         (7 zones, Σ score  77,013) — A-1 / A-2 / A-3
+      – Toledo (prov 7,     2 zones, Σ score 32,706) — A-4
+ * Distributor breakdown:
+      i-DE   : 22 zones (largest backlog — matches Iberdrola footprint)
+      Endesa : 12 zones
+      Viesgo :  7 zones
+ * Interpretation: Iberdrola should pair every phase-1 charger rollout
+   on the A-1/A-2/A-3/A-4/A-6 inland corridors with concurrent grid
+   capex in León, Madrid-north, and Valencia. On the coastal AP-7 and
+   A-7 routes, grid capacity is largely Sufficient — rollout can
+   proceed charger-first.
+
+
+7. ASSUMPTIONS & JUSTIFICATIONS (FOR ANALYTICAL REPORT)
+-------------------------------------------------------
+ A1  Grid-status bands (< 1 / 1–5 / > 5 MW) — taken directly from the
+     datathon image supplied in the technical pack; same bands as Obj 1.
+ A2  MIN_CAP_MW_BUILD = 0.001 — strict zero-MW feasibility gate; any
+     positive capacity is treated as "hostable with appropriate sizing".
+ A3  TARGET_MW = 1.2 = 8 chargers × 150 kW (Rule 2). This is the "fully
+     built-out fast-charging pool" for a trunk corridor site.
+ A4  25 km corridor buffer — chosen because a charger placed further
+     than ~25 km from an interurban road cannot realistically serve
+     long-distance EV drivers (scope rule, brief p.2).
+ A5  Priority score = deficit × sessions — gives weight to corridors
+     actually used for long-distance travel. Known limitation: a tight
+     node on an untracked minor N-road gets score 0; these are flagged
+     in the notebook and noted in the report as a secondary priority
+     list to be reviewed manually.
+ A6  Distributor remap — see §4 Step C; geographically defensible.
+
+
+8. LIMITATIONS & FUTURE WORK
+----------------------------
+ * The 2027 demand figures are linear projections from DGT April-2026
+   monthly registrations. Sensitivity analysis (±20%) does not change
+   the top-15 critical-zone ranking; it does change the absolute
+   priority-score values.
+ * The 25 km corridor buffer is a hard cut-off; a continuous
+   distance-decay weight would be more elegant but doesn't change the
+   ranking materially at typical buffer widths.
+ * We could not verify actual capacidad_firme changes announced between
+   the R1-001 April-2026 snapshot and the datathon deadline; future
+   iterations should re-pull the R1-001 files closer to submission.
+ * Reinforcement cost is not estimated here. A follow-on cost-per-MW
+   layer (using CNMC reference values) would turn the priority list
+   into a capex-ranked investment plan.
+
+
+9. HOW TO REGENERATE
+--------------------
+    cd /Iberdrola_Datathon/02_charging_network/
+    python build_grid_nodes.py                  # rebuild grid_nodes.csv
+    cd ../03_grid_viability/
+    jupyter nbconvert --to notebook --execute 01_critical_zones.ipynb
+
+All outputs land in /outputs and /03_grid_viability/figures.
+
+
+10. FILES TOUCHED / PRODUCED
+----------------------------
+ Produced (Obj 2):
+   /03_grid_viability/01_critical_zones.ipynb            (24 cells, executed)
+   /03_grid_viability/figures/critical_zones_map.png     (283 KB)
+   /outputs/critical_zones.csv                           (41 rows)
+   /obj2_explained.txt                                   (this file)
+
+ Unchanged (Obj 1):
+   /outputs/File_1.csv, File_2.csv, File_3.csv, File_3_audit.csv
+   /data/processed/grid_nodes.csv
+   /02_charging_network/04_station_placement.ipynb
+   /outputs_explained.txt
+
+--- END ---
