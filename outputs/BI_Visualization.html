@@ -120,7 +120,7 @@ html,body{
 ════════════════════════════ */
 #s2{display:grid;grid-template-rows:52px 1fr;}
 .s2-body{display:grid;grid-template-columns:1.7fr 1fr;height:100%;}
-.s2-map{position:relative;display:flex;align-items:flex-end;justify-content:center;border-right:1px solid var(--border);overflow:hidden;background:radial-gradient(ellipse at 55% 45%, rgba(0,164,67,.06) 0%, transparent 65%);}
+.s2-map{position:relative;border-right:1px solid var(--border);overflow:hidden;background:radial-gradient(ellipse at 55% 45%, rgba(0,164,67,.06) 0%, transparent 65%);}
 .map-ph{position:relative;z-index:2;text-align:center;padding:36px 44px;}
 .map-caption{position:absolute;bottom:0;left:0;right:0;z-index:3;background:rgba(6,11,8,.92);border-top:1px solid var(--border);border-radius:0 0 0 0;padding:8px 12px;backdrop-filter:blur(6px);height:100px;overflow:hidden;}
 .map-cap-t{font-size:10px;font-weight:600;color:var(--text);margin-bottom:6px;}
@@ -339,10 +339,10 @@ html,body{
     </div>
   </div>
   <div class="s2-body">
-    <div class="s2-map">
+    <div class="s2-map" style="display:flex;flex-direction:column;position:relative;">
       <div class="grid-bg"></div>
-      <svg id="spainMap" viewBox="0 0 1300 800" style="position:absolute;top:0;left:0;right:0;bottom:56px;width:100%;height:calc(100% - 56px);" preserveAspectRatio="xMidYMid meet"></svg>
-      <div style="position:absolute;bottom:0;left:0;right:0;height:56px;z-index:5;background:rgba(6,11,8,.97);border-top:1px solid var(--border);padding:8px 20px;backdrop-filter:blur(6px);display:flex;align-items:center;gap:24px;flex-wrap:nowrap;overflow:hidden;">
+      <div style="flex-shrink:0;height:100px;background:rgba(6,11,8,.97);border-top:1px solid var(--border);padding:8px 12px;backdrop-filter:blur(6px);height:100px;overflow:hidden;">
+      <div style="flex-shrink:0;height:56px;background:rgba(6,11,8,.97);border-top:1px solid var(--border);padding:8px 20px;backdrop-filter:blur(6px);display:flex;align-items:center;gap:24px;flex-wrap:nowrap;overflow:hidden;">
   <span style="font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);flex-shrink:0;">GRID STATUS</span>
   <div style="width:1px;height:20px;background:var(--border);flex-shrink:0;"></div>
   <div style="display:flex;align-items:center;gap:7px;">
@@ -543,7 +543,7 @@ html,body{
 
 <!-- ══ S5: CLOSE ══ -->
 <div class="slide" id="s5">
-  <div class="grid-bg"></div>
+  <div class="grid-bg" style="position:absolute;inset:0;pointer-events:none;z-index:0;"></div>
   <div class="orb s5-orb"></div>
   <div class="eyerow rv d1" style="margin-bottom:14px;"><span class="eye-dot"></span>Closing / Recommendation</div>
   <h2 class="s5-h rv d2">Own the <span class="em">corridor and the feeder</span><br/>in the same plan, or lose both.</h2>
