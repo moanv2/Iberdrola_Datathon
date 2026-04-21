@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iberdrola — Spain EV 2027 | Network Map</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#060b08;--surface:#090f0b;--card:#0e1711;--card2:#121e15;
+  --border:#1a2c1e;--border2:#243329;
+  --text:#e2ede5;--text2:#b5cebb;--muted:#5e7d65;--faint:#2c412f;
+  --g:#00a443;--g2:#00c44f;--g3:#008c38;
+  --o:#f5a623;--o2:#ffc04a;
+  --r:#e84545;--r2:#ff6b6b;
+  --b:#1a9fd4;
+  --glow:rgba(0,164,67,.15);
+}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}
+
+/* ── MAP SLIDE FULL SCREEN ── */
+#s2{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;}
+
+/* ── TOP HEADER BAR ── */
+.s2-hbar{
+  height:52px;flex-shrink:0;
+  background:rgba(6,11,8,.97);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 18px;z-index:700;backdrop-filter:blur(12px);
+}
+.s2-brand{display:flex;align-items:center;gap:9px;}
+.s2-logo{width:28px;height:28px;border-radius:5px;background:var(--g);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:#fff;}
+.s2-title{font-size:13px;font-weight:600;color:var(--text);}
+.s2-sub-txt{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);}
+.s2-kpis{display:flex;}
+.s2-kpi{padding:0 16px;border-left:1px solid var(--border);text-align:right;}
+.s2-kv{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--text);}
+.s2-kl{font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:1px;}
+
+/* ── MAP BODY ── */
+.s2-body{flex:1;display:flex;overflow:hidden;}
+.s2-sidebar{width:228px;flex-shrink:0;background:rgba(6,11,8,.96);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.s2-sidebar-scroll{flex:1;overflow-y:auto;overscroll-behavior:contain;}
+.s2-sidebar-scroll::-webkit-scrollbar{width:3px;}
+.s2-sidebar-scroll::-webkit-scrollbar-thumb{background:var(--border);}
+#map2{flex:1;}
+
+/* ── FOOTER BAR ── */
+.s2-footer{
+  height:32px;flex-shrink:0;
+  background:rgba(6,11,8,.94);border-top:1px solid var(--border);
+  display:flex;align-items:center;padding:0 16px;gap:14px;
+}
+.s2-fl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);}
+.s2-fl strong{color:var(--text2);}
+.s2-sep{width:1px;height:12px;background:var(--border);}
+
+/* ── SIDEBAR COMPONENTS ── */
+.sb-head{padding:8px 12px 5px;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);}
+.sb-row{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;cursor:pointer;margin:2px 4px;transition:background .1s;}
+.sb-row:hover{background:var(--card);}
+.sb-row.off{opacity:.25;}
+.sb-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.sb-lbl{font-size:12px;font-weight:500;color:var(--text);flex:1;}
+.sb-cnt{font-family:'JetBrains Mono',monospace;font-size:9px;padding:1px 5px;border-radius:4px;background:var(--card2);color:var(--muted);}
+.sb-chips{display:flex;flex-wrap:wrap;gap:4px;padding:7px 10px;}
+.sb-chip{font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;}
+.sb-chip.on{background:var(--g);border-color:var(--g);color:#fff;}
+.sb-chip:hover:not(.on){border-color:var(--g);color:var(--g);}
+.sb-item{display:flex;align-items:center;gap:6px;padding:5px 11px;cursor:pointer;border-left:2px solid transparent;transition:all .1s;}
+.sb-item:hover{background:var(--card);}
+.sb-item.hi{border-left-color:var(--g);background:var(--card);}
+.sb-idot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.sb-info{flex:1;min-width:0;}
+.sb-id{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--text);}
+.sb-rt{font-size:10px;color:var(--muted);}
+.sb-n{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);}
+
+/* ── LEAFLET POPUP ── */
+.leaflet-popup-content-wrapper{background:var(--card2)!important;border:1px solid var(--border2)!important;border-radius:9px!important;box-shadow:0 8px 32px rgba(0,0,0,.6)!important;padding:0!important;}
+.leaflet-popup-tip{display:none!important;}
+.leaflet-popup-tip-container{display:none!important;}
+.leaflet-popup-close-button{color:var(--muted)!important;font-size:16px!important;top:7px!important;right:9px!important;}
+.pu{padding:13px 15px;min-width:205px;}
+.pu-id{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.pu-badge{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:8px;padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:9px;font-weight:700;}
+.pu-row{display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;}
+.pu-k{color:var(--muted);}
+.pu-v{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:var(--text2);}
+.pu-dots{display:flex;flex-wrap:wrap;gap:3px;margin-top:8px;padding:7px;background:var(--card);border-radius:5px;}
+.pu-dot{width:7px;height:7px;border-radius:50%;}
+.pu-fric{margin-top:7px;padding:7px 9px;background:rgba(232,69,69,.08);border:1px solid rgba(232,69,69,.2);border-radius:5px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--r2);line-height:1.65;}
+
+/* ── FRICTION RING ANIMATION ── */
+@keyframes fric-ring{0%{opacity:.7;transform:scale(.3);}100%{opacity:0;transform:scale(1);}}
+</style>
+</head>
+<body>
+
+<div id="s2">
+  <!-- TOP BAR -->
+  <div class="s2-hbar">
+    <div class="s2-brand">
+      <div class="s2-logo">iB</div>
+      <div>
+        <div class="s2-title">Proposed Network · Spain 2027</div>
+        <div class="s2-sub-txt">Set-cover · 150 kW standard · CNMC R1-001</div>
+      </div>
+    </div>
+    <div class="s2-kpis">
+      <div class="s2-kpi"><div class="s2-kv" style="color:var(--g)">19</div><div class="s2-kl">Stations</div></div>
+      <div class="s2-kpi"><div class="s2-kv">176</div><div class="s2-kl">Chargers</div></div>
+      <div class="s2-kpi"><div class="s2-kv" style="color:var(--o)">15</div><div class="s2-kl">Friction Pts</div></div>
+      <div class="s2-kpi"><div class="s2-kv">614K</div><div class="s2-kl">EVs 2027</div></div>
+    </div>
+  </div>
+
+  <!-- BODY: sidebar + map -->
+  <div class="s2-body">
+    <div class="s2-sidebar">
+      <div class="sb-head">Grid Status</div>
+      <div style="padding:4px 3px 2px">
+        <div class="sb-row" id="lr-s" onclick="toggleSt('Sufficient')"><div class="sb-dot" style="background:var(--g)"></div><div class="sb-lbl">Sufficient</div><div class="sb-cnt">4</div></div>
+        <div class="sb-row" id="lr-m" onclick="toggleSt('Moderate')"><div class="sb-dot" style="background:var(--o)"></div><div class="sb-lbl">Moderate</div><div class="sb-cnt">12</div></div>
+        <div class="sb-row" id="lr-c" onclick="toggleSt('Congested')"><div class="sb-dot" style="background:var(--r)"></div><div class="sb-lbl">Congested</div><div class="sb-cnt">3</div></div>
+      </div>
+      <div class="sb-head">Distributor</div>
+      <div class="sb-chips">
+        <div class="sb-chip on" data-d="all" onclick="setDist(this)">All</div>
+        <div class="sb-chip" data-d="i-DE" onclick="setDist(this)">i-DE</div>
+        <div class="sb-chip" data-d="Endesa" onclick="setDist(this)">Endesa</div>
+        <div class="sb-chip" data-d="Viesgo" onclick="setDist(this)">Viesgo</div>
+      </div>
+      <div class="sb-head">Stations</div>
+      <div class="s2-sidebar-scroll" id="stList"></div>
+    </div>
+    <div id="map2"></div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="s2-footer">
+    <div class="s2-fl"><strong>176</strong> chargers</div><div class="s2-sep"></div>
+    <div class="s2-fl">Avg <strong>9.3</strong>/station</div><div class="s2-sep"></div>
+    <div class="s2-fl"><strong>150 kW</strong> standard</div><div class="s2-sep"></div>
+    <div class="s2-fl">Pulsing rings = friction point · Click marker for details</div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const STATIONS=[
+  {id:"IBE_001",lat:42.78247,lng:-7.89001,route:"N-640",n:4, s:"Congested"},
+  {id:"IBE_002",lat:41.93092,lng:-6.11659,route:"N-631",n:8, s:"Moderate"},
+  {id:"IBE_003",lat:42.12507,lng:0.40344, route:"N-123",n:8, s:"Moderate"},
+  {id:"IBE_004",lat:43.13948,lng:-1.55327,route:"N-121",n:8, s:"Moderate"},
+  {id:"IBE_005",lat:39.5103, lng:-7.11023,route:"N-521",n:8, s:"Moderate"},
+  {id:"IBE_006",lat:42.50674,lng:-7.52404,route:"N-120",n:8, s:"Moderate"},
+  {id:"IBE_007",lat:43.1696, lng:-5.07506,route:"N-625",n:8, s:"Moderate"},
+  {id:"IBE_008",lat:41.81106,lng:-2.08831,route:"N-122",n:12,s:"Sufficient"},
+  {id:"IBE_009",lat:42.31315,lng:-4.7168, route:"N-120",n:4, s:"Congested"},
+  {id:"IBE_010",lat:43.09772,lng:-4.68463,route:"N-621",n:4, s:"Congested"},
+  {id:"IBE_011",lat:43.38258,lng:-6.08972,route:"A-63", n:8, s:"Moderate"},
+  {id:"IBE_012",lat:39.29113,lng:-5.0976, route:"N-502",n:8, s:"Moderate"},
+  {id:"IBE_013",lat:39.76613,lng:-3.14194,route:"AP-36",n:8, s:"Moderate"},
+  {id:"IBE_014",lat:39.638,  lng:-2.57696,route:"N-420",n:16,s:"Sufficient"},
+  {id:"IBE_015",lat:39.01835,lng:-4.45849,route:"N-430",n:12,s:"Sufficient"},
+  {id:"IBE_016",lat:42.17957,lng:0.33653, route:"N-123",n:8, s:"Moderate"},
+  {id:"IBE_017",lat:39.46588,lng:-6.97559,route:"N-521",n:8, s:"Moderate"},
+  {id:"IBE_018",lat:42.92336,lng:-8.20548,route:"A-54", n:12,s:"Sufficient"},
+  {id:"IBE_019",lat:42.55675,lng:-4.36465,route:"A-67", n:8, s:"Moderate"}
+];
+const FRICTION=[
+  {id:"FRIC_001",lat:42.78247,lng:-7.89001,route:"N-640",dist:"i-DE",  demand:600, s:"Congested",cap:0.299,kv:66, dk:9.49},
+  {id:"FRIC_002",lat:41.93092,lng:-6.11659,route:"N-631",dist:"i-DE",  demand:1200,s:"Moderate", cap:1.408,kv:45, dk:9.87},
+  {id:"FRIC_003",lat:42.12507,lng:0.40344, route:"N-123",dist:"Endesa",demand:1200,s:"Moderate", cap:1.0,  kv:25, dk:9.58},
+  {id:"FRIC_004",lat:43.13948,lng:-1.55327,route:"N-121",dist:"i-DE",  demand:1200,s:"Moderate", cap:1.85, kv:132,dk:8.17},
+  {id:"FRIC_005",lat:39.5103, lng:-7.11023,route:"N-521",dist:"i-DE",  demand:1200,s:"Moderate", cap:4.0,  kv:45, dk:5.41},
+  {id:"FRIC_006",lat:42.50674,lng:-7.52404,route:"N-120",dist:"i-DE",  demand:1200,s:"Moderate", cap:2.285,kv:132,dk:1.01},
+  {id:"FRIC_007",lat:43.1696, lng:-5.07506,route:"N-625",dist:"Viesgo",demand:1200,s:"Moderate", cap:3.0,  kv:24, dk:9.42},
+  {id:"FRIC_008",lat:42.31315,lng:-4.7168, route:"N-120",dist:"i-DE",  demand:600, s:"Congested",cap:0.12, kv:12, dk:9.76},
+  {id:"FRIC_009",lat:43.09772,lng:-4.68463,route:"N-621",dist:"Viesgo",demand:600, s:"Congested",cap:0.06, kv:12, dk:9.67},
+  {id:"FRIC_010",lat:43.38258,lng:-6.08972,route:"A-63", dist:"Viesgo",demand:1200,s:"Moderate", cap:5.0,  kv:22, dk:7.27},
+  {id:"FRIC_011",lat:39.29113,lng:-5.0976, route:"N-502",dist:"i-DE",  demand:1200,s:"Moderate", cap:4.0,  kv:45, dk:9.02},
+  {id:"FRIC_012",lat:39.76613,lng:-3.14194,route:"AP-36",dist:"i-DE",  demand:1200,s:"Moderate", cap:2.06, kv:15, dk:7.7},
+  {id:"FRIC_013",lat:42.17957,lng:0.33653, route:"N-123",dist:"Endesa",demand:1200,s:"Moderate", cap:1.0,  kv:25, dk:9.67},
+  {id:"FRIC_014",lat:39.46588,lng:-6.97559,route:"N-521",dist:"i-DE",  demand:1200,s:"Moderate", cap:4.0,  kv:45, dk:8.8},
+  {id:"FRIC_015",lat:42.55675,lng:-4.36465,route:"A-67", dist:"i-DE",  demand:1200,s:"Moderate", cap:2.0,  kv:30, dk:5.19}
+];
+const fk={};FRICTION.forEach(f=>{fk[f.lat+','+f.lng]=f;});
+const DC={Sufficient:"#00a443",Moderate:"#f5a623",Congested:"#e84545"};
+
+let map2,markers=[],frings=[],hidden=new Set(),adist='all',hlId=null;
+
+function mkMarker(st){
+  const c=DC[st.s],sz=Math.min(18+st.n*1.4,38),fs=sz<28?9:10;
+  return L.divIcon({className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz/2],
+    html:`<div style="width:${sz}px;height:${sz}px;border-radius:50%;background:${c};border:2px solid rgba(255,255,255,.18);box-shadow:0 0 14px ${c}66,0 2px 8px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:${fs}px;font-weight:700;color:#fff;cursor:pointer;">${st.n}</div>`
+  });
+}
+function mkFric(st){
+  const c=DC[st.s],sz=Math.min(18+st.n*1.4,38),r1=sz+14,r2=sz+30,r3=sz+48;
+  return L.marker([st.lat,st.lng],{icon:L.divIcon({className:'',iconSize:[0,0],iconAnchor:[0,0],
+    html:`<div style="position:relative;width:0;height:0;">
+      <div style="position:absolute;width:${r3}px;height:${r3}px;border-radius:50%;border:1px solid ${c};opacity:0;top:${-r3/2}px;left:${-r3/2}px;animation:fric-ring 2.8s ease-out infinite .9s;"></div>
+      <div style="position:absolute;width:${r2}px;height:${r2}px;border-radius:50%;border:1px solid ${c};opacity:0;top:${-r2/2}px;left:${-r2/2}px;animation:fric-ring 2.8s ease-out infinite .45s;"></div>
+      <div style="position:absolute;width:${r1}px;height:${r1}px;border-radius:50%;border:1.5px solid ${c};opacity:0;top:${-r1/2}px;left:${-r1/2}px;animation:fric-ring 2.8s ease-out infinite 0s;"></div>
+    </div>`}),interactive:false,zIndexOffset:-200});
+}
+function mkPop(st){
+  const c=DC[st.s];
+  const bc={Sufficient:'rgba(0,164,67,.15);color:#00c44f',Moderate:'rgba(245,166,35,.15);color:#f5a623',Congested:'rgba(232,69,69,.15);color:#e84545'}[st.s];
+  const f=fk[st.lat+','+st.lng];
+  let dots='';for(let i=0;i<st.n;i++)dots+=`<div class="pu-dot" style="background:${c}"></div>`;
+  let fb=f?`<div class="pu-fric">⚡ ${f.id} · ${f.dist}<br>Node: ${f.cap} MW @ ${f.kv} kV · ${f.dk} km<br>Demand: ${f.demand.toLocaleString()} kW</div>`:'';
+  return `<div class="pu"><div class="pu-id">${st.id}</div><div class="pu-badge" style="background:${bc}">${st.s}</div>
+    <div class="pu-row"><span class="pu-k">Route</span><span class="pu-v">${st.route}</span></div>
+    <div class="pu-row"><span class="pu-k">Chargers</span><span class="pu-v">${st.n} × 150 kW</span></div>
+    <div class="pu-row"><span class="pu-k">Total</span><span class="pu-v">${st.n*150} kW</span></div>
+    <div class="pu-dots">${dots}</div>${fb}</div>`;
+}
+function renderMap(){
+  if(!map2)return;
+  markers.forEach(m=>map2.removeLayer(m));markers=[];
+  frings.forEach(m=>map2.removeLayer(m));frings=[];
+  STATIONS.forEach(st=>{
+    if(hidden.has(st.s))return;
+    const f=fk[st.lat+','+st.lng];
+    if(adist!=='all'&&(!f||f.dist!==adist))return;
+    if(f){const fr=mkFric(st);fr.addTo(map2);frings.push(fr);}
+    const m=L.marker([st.lat,st.lng],{icon:mkMarker(st),zIndexOffset:100});
+    m.bindPopup(mkPop(st),{maxWidth:260});m._sid=st.id;m.addTo(map2);markers.push(m);
+  });
+  renderList();
+}
+function renderList(){
+  const el=document.getElementById('stList');el.innerHTML='';
+  STATIONS.forEach(st=>{
+    if(hidden.has(st.s))return;
+    const f=fk[st.lat+','+st.lng];
+    if(adist!=='all'&&(!f||f.dist!==adist))return;
+    const d=document.createElement('div');
+    d.className='sb-item'+(hlId===st.id?' hi':'');
+    d.innerHTML=`<div class="sb-idot" style="background:${DC[st.s]}"></div><div class="sb-info"><div class="sb-id">${st.id}</div><div class="sb-rt">${st.route}</div></div><div class="sb-n">${st.n}⚡</div>`;
+    d.onclick=()=>{hlId=st.id;map2.flyTo([st.lat,st.lng],11,{duration:.85});setTimeout(()=>markers.forEach(m=>{if(m._sid===st.id)m.openPopup();}),900);renderList();};
+    el.appendChild(d);
+  });
+  if(!el.children.length)el.innerHTML='<div style="padding:12px;font-size:11px;color:var(--muted);text-align:center">No stations</div>';
+}
+function toggleSt(s){
+  const ids={Sufficient:'lr-s',Moderate:'lr-m',Congested:'lr-c'};
+  hidden.has(s)?(hidden.delete(s),document.getElementById(ids[s]).classList.remove('off')):(hidden.add(s),document.getElementById(ids[s]).classList.add('off'));
+  renderMap();
+}
+function setDist(el){
+  document.querySelectorAll('.sb-chip[data-d]').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');adist=el.dataset.d;renderMap();
+}
+
+// INIT MAP immediately on load
+map2=L.map('map2',{center:[40.3,-3.9],zoom:6,zoomControl:false});
+L.control.zoom({position:'bottomright'}).addTo(map2);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',{attribution:'&copy; CARTO',subdomains:'abcd',maxZoom:19}).addTo(map2);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19,pane:'shadowPane'}).addTo(map2);
+renderMap();
+setTimeout(()=>map2.invalidateSize(),300);
+</script>
+</body>
+</html>
